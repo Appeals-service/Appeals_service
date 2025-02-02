@@ -6,6 +6,8 @@ ROOT_DIR = Path(__file__).parent.parent
 
 
 class Settings(BaseSettings):
+    SERVICE_NAME: str = "Appeals service"
+
     DB_USER: str = "POSTGRES"
     DB_PASSWORD: str = "POSTGRES"
     DB_HOST: str = "localhost"
@@ -22,6 +24,9 @@ class Settings(BaseSettings):
     LOGGING_LEVEL: str = "DEBUG"
     LOGGING_JSON: bool = True
     LOGGING_FORMAT: str = "%(asctime)s - %(filename)s - %(levelname)s - %(message)s"
+
+    AUTHORIZATION_SERVICE_URL: str = "http://localhost:8001"
+    AUTHORIZATION_SERVICE_TIMEOUT: int = 5
 
     ECHO: bool = False
 

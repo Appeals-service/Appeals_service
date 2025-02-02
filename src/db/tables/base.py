@@ -2,7 +2,7 @@ import datetime
 
 from sqlalchemy import Column, DateTime, func, BigInteger
 
-from db.declarative import Base
+from src.db.declarative import Base
 
 
 class BaseModel(Base):
@@ -16,7 +16,7 @@ class BaseModel(Base):
 
 
 class IdMixin:
-    id = Column(BigInteger, primary_key=True, autoincrement=True, nullable=False, comment="Идентификатор")
+    id = Column(BigInteger, primary_key=True, autoincrement=True, nullable=False, comment="Identifier")
 
 
 class CreatedAtMixin:

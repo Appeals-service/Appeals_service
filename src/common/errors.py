@@ -77,10 +77,14 @@ class StatusError500(ApplicationError):
 
 
 class RequestDataError(StatusError400):
-    message = "Неверно переданны данные."
-    context_message = "Одно из этих полей {field} должно быть заполненно."
+    message = "The data was transmitted incorrectly"
+    context_message = "One of these fields {field} must be filled in"
 
 
 class ObjectNotFoundError(StatusError404):
-    message = "Объект не найден"
-    context_message = "Объект с таким {field} не найден"
+    message = "The object was not found"
+    context_message = "An object with such a {field} was not found"
+
+
+class DBConflictError(StatusError409):
+    message = "Conflict when working with the database"
