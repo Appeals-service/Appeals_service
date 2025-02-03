@@ -25,3 +25,11 @@ async def register(request: Request, response: Response, user_data: UserCreate =
 )
 async def login(request: Request, response: Response, user_data: UserAuth = Depends()):
     return await UserService.login(user_data, request.headers["user-agent"], response)
+
+@router.post(
+    "/logout",
+    summary="User logout",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def logout(request: Request, response: Response):
+    await UserService.logout(request, response)

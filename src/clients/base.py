@@ -31,6 +31,7 @@ class BaseAsyncClient(ABC):
         data: dict = None,
         json: dict = None,
         headers: dict = None,
+        cookies: dict = None,
         timeout: int = None,
         retry: int = 2,
         retry_delay: int = 0.5,
@@ -43,9 +44,11 @@ class BaseAsyncClient(ABC):
 
         request_url = (self.base_url + "/" + path.lstrip("/")).strip("/")
 
-        log_json = json.copy()
-        if log_json.get("pwd"):
-            log_json["pwd"] = "***"
+        log_json = None
+        if json:
+            log_json = json.copy()
+            if log_json.get("pwd"):
+                log_json["pwd"] = "***"
         logger.info(
             f"\nSending request: {method} {request_url}"
             f"\nparams: {params}\ndata: {data}\njson: {log_json}\nheaders: {headers}",
@@ -63,6 +66,7 @@ class BaseAsyncClient(ABC):
                         data=data,
                         json=json,
                         headers=headers,
+                        cookies=cookies,
                         timeout=timeout or self.timeout,
                     ) as response:
                         await self._logging_after_response(response, method, request_url)
@@ -107,6 +111,7 @@ class BaseAsyncClient(ABC):
         params=None,
         json=None,
         headers=None,
+        cookies=None,
         timeout=None,
         retry=None,
         retry_delay=None,
@@ -118,6 +123,7 @@ class BaseAsyncClient(ABC):
             params=params,
             json=json,
             headers=headers,
+            cookies=cookies,
             timeout=timeout,
             retry=retry,
             retry_delay=retry_delay,
