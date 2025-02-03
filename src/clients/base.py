@@ -42,9 +42,13 @@ class BaseAsyncClient(ABC):
         assert retry_delay >= 0, "Retry delay must be greater than or equal to 0"
 
         request_url = (self.base_url + "/" + path.lstrip("/")).strip("/")
+
+        log_json = json.copy()
+        if log_json.get("pwd"):
+            log_json["pwd"] = "***"
         logger.info(
             f"\nSending request: {method} {request_url}"
-            f"\nparams: {params}\ndata: {data}\njson: {json}\nheaders: {headers}",
+            f"\nparams: {params}\ndata: {data}\njson: {log_json}\nheaders: {headers}",
         )
 
         while retry >= 0:
@@ -107,7 +111,6 @@ class BaseAsyncClient(ABC):
         retry=None,
         retry_delay=None,
     ):
-        logger.debug(f"Execute _post({path}, {data})")
         return self._request(
             "POST",
             path,
