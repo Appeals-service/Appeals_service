@@ -49,6 +49,8 @@ class BaseAsyncClient(ABC):
             log_json = json.copy()
             if log_json.get("pwd"):
                 log_json["pwd"] = "***"
+            if log_json.get("refresh_token"):
+                log_json["refresh_token"] = "***"
         logger.info(
             f"\nSending request: {method} {request_url}"
             f"\nparams: {params}\ndata: {data}\njson: {log_json}\nheaders: {headers}",

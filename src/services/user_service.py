@@ -46,3 +46,15 @@ class UserService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response_dict)
 
         response.delete_cookie(key="access_token", httponly=True)
+
+    @classmethod
+    async def refresh(cls, refresh_token: str, user_agent: str, response: Response) -> dict:
+        response_status, response_dict = await authorization_client.refresh(
+            {"refresh_token": refresh_token, "user_agent": user_agent}
+        )
+
+        if response_status != status.HTTP_200_OK:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response_dict)
+
+        response.set_cookie(key="access_token", value=response_dict.get("access_token"), httponly=True)
+        return dict(refresh_token=response_dict.get("refresh_token"))
