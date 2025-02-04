@@ -52,3 +52,12 @@ async def refresh_tokens(request: Request, response: Response, refresh_token: st
 )
 async def get_user_data(request: Request):
     return await UserService.me(request.cookies)
+
+
+@router.delete(
+    "/delete",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete user",
+)
+async def delete(request: Request, user_id: str = Body()):
+    return await UserService.delete(request.cookies, user_id)

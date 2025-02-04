@@ -67,3 +67,10 @@ class UserService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response_dict)
 
         return response_dict
+
+    @classmethod
+    async def delete(cls, cookies: dict, user_id: str) -> None:
+        response_status, response_dict = await authorization_client.delete(cookies, user_id)
+
+        if response_status != status.HTTP_204_NO_CONTENT:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response_dict)

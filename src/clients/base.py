@@ -156,13 +156,16 @@ class BaseAsyncClient(ABC):
             retry_delay=retry_delay,
         )
 
-    def _delete(self, path, data=None, json=None, headers=None, timeout=None, retry=None, retry_delay=None):
+    def _delete(
+            self, path, data=None, json=None, headers=None, cookies=None, timeout=None, retry=None, retry_delay=None
+    ):
         return self._request(
             "DELETE",
             path,
             data=data,
             json=json,
             headers=headers,
+            cookies=cookies,
             timeout=timeout,
             retry=retry,
             retry_delay=retry_delay,
