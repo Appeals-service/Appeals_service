@@ -73,4 +73,11 @@ class UserService:
         response_status, response_dict = await authorization_client.delete(cookies, user_id)
 
         if response_status != status.HTTP_204_NO_CONTENT:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response_dict)
+            raise HTTPException(
+                status_code=(
+                    status.HTTP_403_FORBIDDEN
+                    if response_status == status.HTTP_403_FORBIDDEN else
+                    status.HTTP_400_BAD_REQUEST
+                ),
+                detail=response_dict,
+            )
