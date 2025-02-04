@@ -58,3 +58,12 @@ class UserService:
 
         response.set_cookie(key="access_token", value=response_dict.get("access_token"), httponly=True)
         return dict(refresh_token=response_dict.get("refresh_token"))
+
+    @classmethod
+    async def me(cls, cookies: dict) -> dict:
+        response_status, response_dict = await authorization_client.me(cookies)
+
+        if response_status != status.HTTP_200_OK:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response_dict)
+
+        return response_dict

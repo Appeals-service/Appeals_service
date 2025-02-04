@@ -20,5 +20,8 @@ class AuthorizationClient(BaseAsyncClient):
         async with self._post(path="/api/v1/users/refresh", json=user_data) as response:
             return response.status, await response.json()
 
+    async def me(self, cookies: dict) -> tuple:
+        async with self._get(path="/api/v1/users/me", cookies=cookies) as response:
+            return response.status, await response.json()
 
 authorization_client = AuthorizationClient(settings.AUTHORIZATION_SERVICE_URL, settings.AUTHORIZATION_SERVICE_TIMEOUT)

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Depends, Request, Response, Body
 
-from dto.schemas.users import UserCreate, RefreshToken, UserAuth
+from dto.schemas.users import UserCreate, RefreshToken, UserAuth, UserBase
 from services.user_service import UserService
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -43,3 +43,12 @@ async def logout(request: Request, response: Response):
 )
 async def refresh_tokens(request: Request, response: Response, refresh_token: str = Body()):
     return await UserService.refresh(refresh_token, request.headers["user-agent"], response)
+
+@router.get(
+    "/me",
+    response_model=UserBase,
+    summary="Get current user data",
+    response_description="User data",
+)
+async def get_user_data(request: Request):
+    return await UserService.me(request.cookies)

@@ -95,12 +95,13 @@ class BaseAsyncClient(ABC):
             await response.read()
             logger.warning(f"Request failed: {method} {request_url}. Status code: {response.status}")
 
-    def _get(self, path, params=None, headers=None, timeout=None, retry=None, retry_delay=None):
+    def _get(self, path, params=None, headers=None, cookies=None, timeout=None, retry=None, retry_delay=None):
         return self._request(
             "GET",
             path,
             params,
             headers=headers,
+            cookies=cookies,
             timeout=timeout,
             retry=retry,
             retry_delay=retry_delay,
