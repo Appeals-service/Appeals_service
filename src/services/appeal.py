@@ -25,7 +25,11 @@ class AppealService:
     @classmethod
     async def get_appeals_list(cls, filters: AppealListFilters, role_n_id: tuple[UserRole, str]) -> list[Appeal]:
         filters = filters.model_dump()
-        filters.update({"user_id" if role_n_id[0] == UserRole.user else "executor_id": role_n_id[1]})
+
+        if role_n_id[0] == UserRole.user:
+            filters.update({"user_id": role_n_id[1]})
+        elif role_n_id[0] == UserRole.executor:
+            filters.update({"executor_id": role_n_id[1]})
 
         async with AsyncSession() as session:
             return await AppealRepository.select_appeals_list(session, filters)
