@@ -26,6 +26,7 @@ class AppealListFilters(BaseFilters):
     )
     created_date_from: datetime | None = Field(default=None, examples=["2025-01-01"])
     created_date_to: datetime | None = Field(default=None, examples=["2025-12-31"])
+    self: bool | None = Field(default=True, description="Select only your own appeals")
 
 
 class BaseAppealResponse(BaseAppeal):

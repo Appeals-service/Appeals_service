@@ -27,20 +27,19 @@ class AppealService:
     async def get_appeals_list(cls, filters: AppealListFilters, role_n_id: tuple[UserRole, str]) -> list[Row]:
         filters = filters.model_dump()
 
-        if role_n_id[0] == UserRole.user:
-            filters.update({"user_id": role_n_id[1]})
-        elif role_n_id[0] == UserRole.executor:
-            filters.update({"executor_id": role_n_id[1]})
+        if filters.get("self") and role_n_id[0] in {UserRole.user, UserRole.executor}:
+            filters.update({f"{role_n_id[0]}_id": role_n_id[1]})
 
         async with AsyncSession() as session:
             return await AppealRepository.select_appeals_list(session, filters)
 
 
     @classmethod
-    async def get_appeal(cls, appeal_id: int) -> Row:
+    async def get_appeal(cls, appeal_id: int, role_n_id: tuple[UserRole, str]) -> Row:
+        user_id = role_n_id[1] if role_n_id[0] == UserRole.user else None
 
         async with AsyncSession() as session:
-            appeal = await AppealRepository.select_appeal(session, appeal_id)
+            appeal = await AppealRepository.select_appeal(session, appeal_id, user_id)
 
         if not appeal:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal not found")

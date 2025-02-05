@@ -22,4 +22,5 @@ async def get_appeals_list(
 
 @router.get("/{appeal_id}", response_model=AppealResponse, summary="Get appeal detail")
 async def get_appeal(appeal_id: int, role_n_id: tuple[UserRole, str] = Depends(allowed_for_all)):
-    return await AppealService.get_appeal(appeal_id)
+    return await AppealService.get_appeal(appeal_id, role_n_id)
+

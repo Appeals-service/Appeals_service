@@ -23,10 +23,14 @@ class AppealRepository:
         return appeals.all()
 
     @classmethod
-    async def select_appeal(cls, session: AsyncSession, appeal_id: int) -> Row:
+    async def select_appeal(cls, session: AsyncSession, appeal_id: int, user_id: str | None = None) -> Row:
         query = select(
             Appeal.id, Appeal.message, Appeal.responsibility_area, Appeal.status, Appeal.comment, Appeal.created_at
         ).where(Appeal.id == appeal_id)
+
+        if user_id:
+            query = query.where(Appeal.user_id == user_id)
+
         appeal = await session.execute(query)
         return appeal.one_or_none()
 
