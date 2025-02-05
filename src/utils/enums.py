@@ -19,3 +19,7 @@ class AppealResponsibilityArea(StrEnum):
     administration = "administration"
     law_enforcement = "law_enforcement"
     other = "other"
+
+class TokenType(StrEnum):
+    access = "acc"
+    refresh = "ref"
