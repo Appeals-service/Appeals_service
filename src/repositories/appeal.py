@@ -1,4 +1,5 @@
 from sqlalchemy import select, Select
+from sqlalchemy.engine.row import Row
 
 from datetime import timedelta
 
@@ -13,11 +14,21 @@ class AppealRepository:
         session.add(Appeal(**appeal_data))
 
     @classmethod
-    async def select_appeals_list(cls, session: AsyncSession, filters: dict) -> list[Appeal]:
-        query = select(Appeal.message, Appeal.responsibility_area, Appeal.status, Appeal.comment, Appeal.created_at)
+    async def select_appeals_list(cls, session: AsyncSession, filters: dict) -> list[Row]:
+        query = select(
+            Appeal.id, Appeal.message, Appeal.responsibility_area, Appeal.status, Appeal.comment, Appeal.created_at
+        )
         query = cls._get_filtered_query(query, filters)
         appeals = await session.execute(query)
         return appeals.all()
+
+    @classmethod
+    async def select_appeal(cls, session: AsyncSession, appeal_id: int) -> Row:
+        query = select(
+            Appeal.id, Appeal.message, Appeal.responsibility_area, Appeal.status, Appeal.comment, Appeal.created_at
+        ).where(Appeal.id == appeal_id)
+        appeal = await session.execute(query)
+        return appeal.one_or_none()
 
     @staticmethod
     def _get_filtered_query(query: Select, filters: dict) -> Select:

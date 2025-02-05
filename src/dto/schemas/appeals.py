@@ -28,7 +28,16 @@ class AppealListFilters(BaseFilters):
     created_date_to: datetime | None = Field(default=None, examples=["2025-12-31"])
 
 
-class AppealListResponse(BaseAppeal):
+class BaseAppealResponse(BaseAppeal):
     status: AppealStatus
     comment: str | None
     created_at: datetime
+    id: int
+
+
+class AppealListResponse(BaseAppealResponse):
+    ...
+
+
+class AppealResponse(BaseAppealResponse):
+    ...
