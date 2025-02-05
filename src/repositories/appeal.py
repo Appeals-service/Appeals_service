@@ -1,4 +1,4 @@
-from sqlalchemy import select, Select
+from sqlalchemy import select, Select, update
 from sqlalchemy.engine.row import Row
 
 from datetime import timedelta
@@ -10,7 +10,7 @@ from db.tables import Appeal
 class AppealRepository:
 
     @classmethod
-    async def insert_appeal(cls, session: AsyncSession, appeal_data: dict) -> None:
+    async def insert(cls, session: AsyncSession, appeal_data: dict) -> None:
         session.add(Appeal(**appeal_data))
 
     @classmethod
@@ -19,8 +19,8 @@ class AppealRepository:
             Appeal.id, Appeal.message, Appeal.responsibility_area, Appeal.status, Appeal.comment, Appeal.created_at
         )
         query = cls._get_filtered_query(query, filters)
-        appeals = await session.execute(query)
-        return appeals.all()
+        result = await session.execute(query)
+        return result.all()
 
     @classmethod
     async def select_appeal(cls, session: AsyncSession, appeal_id: int, user_id: str | None = None) -> Row:
@@ -31,8 +31,16 @@ class AppealRepository:
         if user_id:
             query = query.where(Appeal.user_id == user_id)
 
-        appeal = await session.execute(query)
-        return appeal.one_or_none()
+        result = await session.execute(query)
+        return result.one_or_none()
+
+    @classmethod
+    async def update(cls, session: AsyncSession, filters: dict, values: dict) -> Row:
+        query = update(Appeal).values(**values).filter_by(**filters).returning(
+            Appeal.id, Appeal.message, Appeal.responsibility_area, Appeal.status, Appeal.comment, Appeal.created_at
+        )
+        result = await session.execute(query)
+        return result.one_or_none()
 
     @staticmethod
     def _get_filtered_query(query: Select, filters: dict) -> Select:

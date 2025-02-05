@@ -42,3 +42,17 @@ class AppealListResponse(BaseAppealResponse):
 
 class AppealResponse(BaseAppealResponse):
     ...
+
+
+class UserAppealUpdate(BaseModel):
+    message: str | None = Field(
+        default=None, min_length=10, max_length=500, examples=["You really need to do something"]
+    )
+    responsibility_area: AppealResponsibilityArea | None= Field(
+        default=None, examples=[AppealResponsibilityArea.housing]
+    )
+
+
+class ExecutorAppealUpdate(BaseModel):
+    status: AppealStatus | None = Field(default=None, examples=[AppealStatus.accepted])
+    comment: str | None = Field(default=None, min_length=10, max_length=500, examples=["All done"])

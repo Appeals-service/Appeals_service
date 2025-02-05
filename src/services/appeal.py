@@ -3,8 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.engine.row import Row
 
 from db.connector import AsyncSession
-from db.tables import Appeal
-from dto.schemas.appeals import AppealCreate, AppealListFilters
+from dto.schemas.appeals import AppealCreate, AppealListFilters, ExecutorAppealUpdate, UserAppealUpdate
 from repositories.appeal import AppealRepository
 from utils.enums import AppealStatus, UserRole
 
@@ -12,12 +11,12 @@ from utils.enums import AppealStatus, UserRole
 class AppealService:
 
     @classmethod
-    async def create_appeal(cls, appeal_data: AppealCreate, user_id: str):
+    async def create(cls, appeal_data: AppealCreate, user_id: str):
         appeal_data = appeal_data.model_dump()
         appeal_data.update({"user_id": user_id, "status": AppealStatus.accepted})
 
         async with AsyncSession() as session:
-            await AppealRepository.insert_appeal(session, appeal_data)
+            await AppealRepository.insert(session, appeal_data)
             try:
                 await session.commit()
             except IntegrityError as e:
@@ -39,9 +38,41 @@ class AppealService:
         user_id = role_n_id[1] if role_n_id[0] == UserRole.user else None
 
         async with AsyncSession() as session:
-            appeal = await AppealRepository.select_appeal(session, appeal_id, user_id)
+            appeal_row = await AppealRepository.select_appeal(session, appeal_id, user_id)
 
-        if not appeal:
+        if not appeal_row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal not found")
 
-        return appeal
+        return appeal_row
+
+    @classmethod
+    async def update(
+            cls,
+            appeal_id: int,
+            user_upd_data: UserAppealUpdate,
+            executor_upd_data: ExecutorAppealUpdate,
+            role_n_id: tuple[UserRole, str],
+    ):
+        values = None
+        filters = {"id": appeal_id}
+        if role_n_id[0] == UserRole.user:
+            values = user_upd_data.model_dump(exclude_none=True)
+            filters.update({"user_id": role_n_id[1], "status": AppealStatus.accepted})
+        elif role_n_id[0] == UserRole.executor:
+            values = executor_upd_data.model_dump(exclude_none=True)
+            filters.update({"executor_id": role_n_id[1], "status": AppealStatus.in_progress})
+        elif role_n_id[0] == UserRole.admin:
+            values = user_upd_data.model_dump(exclude_none=True)
+            values.update(executor_upd_data.model_dump(exclude_none=True))
+
+        if not values:
+            return
+
+        async with AsyncSession() as session:
+            appeal_row = await AppealRepository.update(session, filters, values)
+            await session.commit()
+
+        if not appeal_row:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal for update not found")
+
+        return appeal_row
