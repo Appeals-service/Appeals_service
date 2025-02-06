@@ -11,7 +11,7 @@ from utils.enums import AppealStatus, UserRole
 class AppealService:
 
     @staticmethod
-    async def create(appeal_data: AppealCreate, user_id: str):
+    async def create(appeal_data: AppealCreate, user_id: str) -> None:
         appeal_data = appeal_data.model_dump()
         appeal_data.update({"user_id": user_id, "status": AppealStatus.accepted})
 
@@ -51,7 +51,7 @@ class AppealService:
             user_upd_data: UserAppealUpdate,
             executor_upd_data: ExecutorAppealUpdate,
             role_n_id: tuple[UserRole, str],
-    ):
+    ) -> Row:
         values = None
         filters = {"id": appeal_id}
         if role_n_id[0] == UserRole.user:

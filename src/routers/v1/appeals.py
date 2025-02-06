@@ -35,12 +35,12 @@ async def update(
         user_upd_data: UserAppealUpdate = Depends(),
         executor_upd_data: ExecutorAppealUpdate = Depends(),
         role_n_id: tuple[UserRole, str] = Depends(allowed_for_all),
-):
+) -> Row:
     return await AppealService.update(appeal_id, user_upd_data, executor_upd_data, role_n_id)
 
 
 @router.delete("/{appeal_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete appeal")
-async def delete(appeal_id: int, role_n_id: tuple[UserRole, str] = Depends(allowed_for_admin_user)):
+async def delete(appeal_id: int, role_n_id: tuple[UserRole, str] = Depends(allowed_for_admin_user)) -> None:
     return await AppealService.delete(appeal_id, role_n_id)
 
 
@@ -54,5 +54,5 @@ async def executor_assign(
         appeal_id: int,
         executor_id: str | None = None,
         role_n_id: tuple[UserRole, str] = Depends(allowed_for_admin_executor),
-):
+) -> Row:
     return await AppealService.executor_assign(appeal_id, executor_id, role_n_id)
