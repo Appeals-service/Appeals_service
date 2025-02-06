@@ -10,8 +10,8 @@ from utils.enums import AppealStatus, UserRole
 
 class AppealService:
 
-    @classmethod
-    async def create(cls, appeal_data: AppealCreate, user_id: str):
+    @staticmethod
+    async def create(appeal_data: AppealCreate, user_id: str):
         appeal_data = appeal_data.model_dump()
         appeal_data.update({"user_id": user_id, "status": AppealStatus.accepted})
 
@@ -22,8 +22,8 @@ class AppealService:
             except IntegrityError as e:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e.args[0].split('DETAIL:')[1]}")
 
-    @classmethod
-    async def get_appeals_list(cls, filters: AppealListFilters, role_n_id: tuple[UserRole, str]) -> list[Row]:
+    @staticmethod
+    async def get_appeals_list(filters: AppealListFilters, role_n_id: tuple[UserRole, str]) -> list[Row]:
         filters = filters.model_dump()
 
         if filters.get("self") and role_n_id[0] in {UserRole.user, UserRole.executor}:
@@ -33,8 +33,8 @@ class AppealService:
             return await AppealRepository.select_appeals_list(session, filters)
 
 
-    @classmethod
-    async def get_appeal(cls, appeal_id: int, role_n_id: tuple[UserRole, str]) -> Row:
+    @staticmethod
+    async def get_appeal(appeal_id: int, role_n_id: tuple[UserRole, str]) -> Row:
         user_id = role_n_id[1] if role_n_id[0] == UserRole.user else None
 
         async with AsyncSession() as session:
@@ -45,9 +45,8 @@ class AppealService:
 
         return appeal_row
 
-    @classmethod
+    @staticmethod
     async def update(
-            cls,
             appeal_id: int,
             user_upd_data: UserAppealUpdate,
             executor_upd_data: ExecutorAppealUpdate,
@@ -80,8 +79,8 @@ class AppealService:
 
         return appeal_row
 
-    @classmethod
-    async def delete(cls, appeal_id: int, role_n_id: tuple[UserRole, str]) -> None:
+    @staticmethod
+    async def delete(appeal_id: int, role_n_id: tuple[UserRole, str]) -> None:
         filters = {"id": appeal_id}
         if role_n_id[0] == UserRole.user:
             filters.update({"user_id": role_n_id[1], "status": AppealStatus.accepted})
@@ -92,3 +91,25 @@ class AppealService:
                 await session.commit()
             except IntegrityError as e:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e.args[0].split('DETAIL:')[1]}")
+
+    @staticmethod
+    async def executor_assign(appeal_id: int, executor_id: str | None, role_n_id: tuple[UserRole, str]) -> Row:
+        if role_n_id[0] == UserRole.admin and not executor_id:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The executor's ID is required")
+        elif role_n_id[0] == UserRole.executor:
+            executor_id = role_n_id[1]
+
+        filters = {"id": appeal_id, "status": AppealStatus.accepted}
+        values = {"executor_id": executor_id, "status": AppealStatus.in_progress}
+
+        async with AsyncSession() as session:
+            appeal_row = await AppealRepository.update(session, filters, values)
+            try:
+                await session.commit()
+            except IntegrityError as e:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e.args[0].split('DETAIL:')[1]}")
+
+        if not appeal_row:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal for assign not found")
+
+        return appeal_row

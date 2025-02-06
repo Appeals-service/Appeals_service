@@ -4,10 +4,10 @@ from sqlalchemy.engine.row import Row
 from dto.schemas.appeals import AppealCreate, AppealListFilters, AppealListResponse, AppealResponse, UserAppealUpdate, \
     ExecutorAppealUpdate
 from services.appeal import AppealService
-from src.utils.role_checker import allowed_for_admin_user, allowed_for_all
+from src.utils.role_checker import allowed_for_admin_user, allowed_for_all, allowed_for_admin_executor
 from utils.enums import UserRole
 
-router = APIRouter(tags=["Appeal"])
+router = APIRouter(prefix="/appeals", tags=["Appeal"])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, summary="Create appeal")
@@ -42,3 +42,17 @@ async def update(
 @router.delete("/{appeal_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete appeal")
 async def delete(appeal_id: int, role_n_id: tuple[UserRole, str] = Depends(allowed_for_admin_user)):
     return await AppealService.delete(appeal_id, role_n_id)
+
+
+@router.patch(
+    "/{appeal_id}/assign",
+    response_model=AppealResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Assign a executor",
+)
+async def executor_assign(
+        appeal_id: int,
+        executor_id: str | None = None,
+        role_n_id: tuple[UserRole, str] = Depends(allowed_for_admin_executor),
+):
+    return await AppealService.executor_assign(appeal_id, executor_id, role_n_id)
