@@ -1,4 +1,4 @@
-from sqlalchemy import select, Select, update
+from sqlalchemy import select, Select, update, delete
 from sqlalchemy.engine.row import Row
 
 from datetime import timedelta
@@ -9,8 +9,8 @@ from db.tables import Appeal
 
 class AppealRepository:
 
-    @classmethod
-    async def insert(cls, session: AsyncSession, appeal_data: dict) -> None:
+    @staticmethod
+    async def insert(session: AsyncSession, appeal_data: dict) -> None:
         session.add(Appeal(**appeal_data))
 
     @classmethod
@@ -22,8 +22,8 @@ class AppealRepository:
         result = await session.execute(query)
         return result.all()
 
-    @classmethod
-    async def select_appeal(cls, session: AsyncSession, appeal_id: int, user_id: str | None = None) -> Row:
+    @staticmethod
+    async def select_appeal(session: AsyncSession, appeal_id: int, user_id: str | None = None) -> Row:
         query = select(
             Appeal.id, Appeal.message, Appeal.responsibility_area, Appeal.status, Appeal.comment, Appeal.created_at
         ).where(Appeal.id == appeal_id)
@@ -34,13 +34,18 @@ class AppealRepository:
         result = await session.execute(query)
         return result.one_or_none()
 
-    @classmethod
-    async def update(cls, session: AsyncSession, filters: dict, values: dict) -> Row:
+    @staticmethod
+    async def update(session: AsyncSession, filters: dict, values: dict) -> Row:
         query = update(Appeal).values(**values).filter_by(**filters).returning(
             Appeal.id, Appeal.message, Appeal.responsibility_area, Appeal.status, Appeal.comment, Appeal.created_at
         )
         result = await session.execute(query)
         return result.one_or_none()
+
+    @staticmethod
+    async def delete(session: AsyncSession, filters: dict) -> None:
+        query = delete(Appeal).filter_by(**filters)
+        await session.execute(query)
 
     @staticmethod
     def _get_filtered_query(query: Select, filters: dict) -> Select:
@@ -63,4 +68,4 @@ class AppealRepository:
         if offset := filters.get("offset"):
             query = query.offset(offset)
 
-        return query
+        return query.order_by(Appeal.id)

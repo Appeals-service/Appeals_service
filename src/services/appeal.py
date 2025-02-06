@@ -70,9 +70,25 @@ class AppealService:
 
         async with AsyncSession() as session:
             appeal_row = await AppealRepository.update(session, filters, values)
-            await session.commit()
+            try:
+                await session.commit()
+            except IntegrityError as e:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e.args[0].split('DETAIL:')[1]}")
 
         if not appeal_row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal for update not found")
 
         return appeal_row
+
+    @classmethod
+    async def delete(cls, appeal_id: int, role_n_id: tuple[UserRole, str]) -> None:
+        filters = {"id": appeal_id}
+        if role_n_id[0] == UserRole.user:
+            filters.update({"user_id": role_n_id[1], "status": AppealStatus.accepted})
+
+        async with AsyncSession() as session:
+            await AppealRepository.delete(session, filters)
+            try:
+                await session.commit()
+            except IntegrityError as e:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e.args[0].split('DETAIL:')[1]}")

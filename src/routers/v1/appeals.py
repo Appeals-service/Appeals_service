@@ -4,7 +4,7 @@ from sqlalchemy.engine.row import Row
 from dto.schemas.appeals import AppealCreate, AppealListFilters, AppealListResponse, AppealResponse, UserAppealUpdate, \
     ExecutorAppealUpdate
 from services.appeal import AppealService
-from src.utils.role_checker import allowed_for_user, allowed_for_all
+from src.utils.role_checker import allowed_for_admin_user, allowed_for_all
 from utils.enums import UserRole
 
 router = APIRouter(tags=["Appeal"])
@@ -12,7 +12,7 @@ router = APIRouter(tags=["Appeal"])
 
 @router.post("/", status_code=status.HTTP_201_CREATED, summary="Create appeal")
 async def create(
-        appeal_data: AppealCreate = Depends(), role_n_id: tuple[UserRole, str] = Depends(allowed_for_user)
+        appeal_data: AppealCreate = Depends(), role_n_id: tuple[UserRole, str] = Depends(allowed_for_admin_user)
 ) -> None:
     return await AppealService.create(appeal_data, role_n_id[1])
 
@@ -37,3 +37,8 @@ async def update(
         role_n_id: tuple[UserRole, str] = Depends(allowed_for_all),
 ):
     return await AppealService.update(appeal_id, user_upd_data, executor_upd_data, role_n_id)
+
+
+@router.delete("/{appeal_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete appeal")
+async def delete(appeal_id: int, role_n_id: tuple[UserRole, str] = Depends(allowed_for_admin_user)):
+    return await AppealService.delete(appeal_id, role_n_id)

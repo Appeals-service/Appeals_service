@@ -19,5 +19,5 @@ class RoleChecker:
 
 
 allowed_for_admin = RoleChecker({UserRole.admin})
-allowed_for_user = RoleChecker({UserRole.admin, UserRole.user})
+allowed_for_admin_user = RoleChecker({UserRole.admin, UserRole.user})
 allowed_for_all = RoleChecker({role for role in UserRole})
