@@ -32,3 +32,6 @@ class RefreshToken(BaseModel):
 class UserAuth(BaseModel):
     login_or_email: str = Field(min_length=3, max_length=50, examples=["john_doe@mail.net"])
     pwd: str = Field(min_length=5, max_length=50)
+
+class UserListResponse(UserBase):
+    id: str

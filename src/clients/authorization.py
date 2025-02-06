@@ -1,5 +1,6 @@
 from src.clients.base import BaseAsyncClient
 from src.common.settings import settings
+from utils.enums import UserRole
 
 
 class AuthorizationClient(BaseAsyncClient):
@@ -20,8 +21,13 @@ class AuthorizationClient(BaseAsyncClient):
         async with self._post(path="/api/v1/users/refresh", json=user_data) as response:
             return response.status, await response.json()
 
-    async def me(self, cookies: dict) -> tuple:
+    async def get_me(self, cookies: dict) -> tuple:
         async with self._get(path="/api/v1/users/me", cookies=cookies) as response:
+            return response.status, await response.json()
+
+    async def get_list(self, cookies: dict, role: UserRole | None = None) -> tuple:
+        params = {"role": role} if role else None
+        async with self._get(path="/api/v1/users/list", params=params, cookies=cookies) as response:
             return response.status, await response.json()
 
     async def delete(self, cookies: dict, user_id: str) -> tuple:

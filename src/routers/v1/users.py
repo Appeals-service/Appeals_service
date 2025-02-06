@@ -1,7 +1,8 @@
 from fastapi import APIRouter, status, Depends, Request, Response, Body
 
-from dto.schemas.users import UserCreate, RefreshToken, UserAuth, UserBase
+from dto.schemas.users import UserCreate, RefreshToken, UserAuth, UserBase, UserListResponse
 from services.user import UserService
+from utils.enums import UserRole
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -26,6 +27,7 @@ async def register(request: Request, response: Response, user_data: UserCreate):
 async def login(request: Request, response: Response, user_data: UserAuth):
     return await UserService.login(user_data, request.headers["user-agent"], response)
 
+
 @router.post(
     "/logout",
     summary="User logout",
@@ -44,6 +46,7 @@ async def logout(request: Request, response: Response):
 async def refresh_tokens(request: Request, response: Response, refresh_token: str = Body()):
     return await UserService.refresh(refresh_token, request.headers["user-agent"], response)
 
+
 @router.get(
     "/me",
     response_model=UserBase,
@@ -51,7 +54,17 @@ async def refresh_tokens(request: Request, response: Response, refresh_token: st
     response_description="User data",
 )
 async def get_user_data(request: Request):
-    return await UserService.me(request.cookies)
+    return await UserService.get_me(request.cookies)
+
+
+@router.get(
+    "/list",
+    response_model=list[UserListResponse],
+    summary="Get users list",
+    response_description="Users list",
+)
+async def get_users_list(request: Request, role: UserRole | None = None):
+    return await UserService.get_list(request.cookies, role)
 
 
 @router.delete(

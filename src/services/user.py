@@ -2,6 +2,7 @@ from fastapi import Response, HTTPException, status, Request
 
 from src.clients.authorization import authorization_client
 from src.dto.schemas.users import UserCreate, UserAuth
+from utils.enums import UserRole
 
 
 class UserService:
@@ -21,8 +22,8 @@ class UserService:
         response.set_cookie(key="access_token", value=response_dict.get("access_token"), httponly=True)
         return dict(refresh_token=response_dict.get("refresh_token"))
 
-    @classmethod
-    async def login(cls, user_data: UserAuth, user_agent: str, response: Response) -> dict:
+    @staticmethod
+    async def login(user_data: UserAuth, user_agent: str, response: Response) -> dict:
         user_data_dict = user_data.model_dump()
         user_data_dict.update({"user_agent": user_agent})
         response_status, response_dict = await authorization_client.login(user_data_dict)
@@ -36,8 +37,8 @@ class UserService:
         response.set_cookie(key="access_token", value=response_dict.get("access_token"), httponly=True)
         return dict(refresh_token=response_dict.get("refresh_token"))
 
-    @classmethod
-    async def logout(cls, request: Request, response: Response) -> None:
+    @staticmethod
+    async def logout(request: Request, response: Response) -> None:
         response_status, response_dict = await authorization_client.logout(
             request.cookies, request.headers["user-agent"]
         )
@@ -47,8 +48,8 @@ class UserService:
 
         response.delete_cookie(key="access_token", httponly=True)
 
-    @classmethod
-    async def refresh(cls, refresh_token: str, user_agent: str, response: Response) -> dict:
+    @staticmethod
+    async def refresh(refresh_token: str, user_agent: str, response: Response) -> dict:
         response_status, response_dict = await authorization_client.refresh(
             {"refresh_token": refresh_token, "user_agent": user_agent}
         )
@@ -59,17 +60,17 @@ class UserService:
         response.set_cookie(key="access_token", value=response_dict.get("access_token"), httponly=True)
         return dict(refresh_token=response_dict.get("refresh_token"))
 
-    @classmethod
-    async def me(cls, cookies: dict) -> dict:
-        response_status, response_dict = await authorization_client.me(cookies)
+    @staticmethod
+    async def get_me(cookies: dict) -> dict:
+        response_status, response_dict = await authorization_client.get_me(cookies)
 
         if response_status != status.HTTP_200_OK:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response_dict)
 
         return response_dict
 
-    @classmethod
-    async def delete(cls, cookies: dict, user_id: str) -> None:
+    @staticmethod
+    async def delete(cookies: dict, user_id: str) -> None:
         response_status, response_dict = await authorization_client.delete(cookies, user_id)
 
         if response_status != status.HTTP_204_NO_CONTENT:
@@ -81,3 +82,18 @@ class UserService:
                 ),
                 detail=response_dict,
             )
+
+    @staticmethod
+    async def get_list(cookies: dict, role: UserRole | None = None) -> list:
+        response_status, response = await authorization_client.get_list(cookies, role)
+
+        if response_status != status.HTTP_200_OK:
+            raise HTTPException(
+                status_code=(
+                    status.HTTP_403_FORBIDDEN
+                    if response_status == status.HTTP_403_FORBIDDEN else
+                    status.HTTP_400_BAD_REQUEST
+                ),
+                detail=response,
+            )
+        return response
