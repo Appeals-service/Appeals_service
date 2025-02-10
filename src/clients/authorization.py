@@ -1,4 +1,4 @@
-from src.clients.base import BaseAsyncClient
+from src.clients.base_http import BaseAsyncClient
 from src.common.settings import settings
 from utils.enums import UserRole
 

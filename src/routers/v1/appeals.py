@@ -35,7 +35,7 @@ async def update(
         user_upd_data: UserAppealUpdate = Depends(),
         executor_upd_data: ExecutorAppealUpdate = Depends(),
         role_n_id: tuple[UserRole, str] = Depends(allowed_for_all),
-) -> Row:
+) -> Row | None:
     return await AppealService.update(appeal_id, user_upd_data, executor_upd_data, role_n_id)
 
 

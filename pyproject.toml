@@ -20,6 +20,8 @@ psycopg2-binary = "^2.9.10"
 aiohttp = "^3.11.11"
 pyjwt = "^2.10.1"
 user-agents = "^2.2.0"
+python-multipart = "^0.0.20"
+aiobotocore = "^2.19.0"
 
 
 [build-system]

@@ -24,6 +24,14 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "feisom_ob_teibl_rt54uyjhn67rtgfvbrtr_nyuumn"
     ALGORITHM: str = "HS256"
 
+    MAX_PHOTO_SIZE_IN_BYTES: int = 5 * 1024 * 1024
+
+    S3_URL: str
+    S3_BUCKET_NAME: str
+    S3_ACCESS_KEY: str
+    S3_SECRET_KEY: str
+    SELECTEL_STORAGE_DOMAIN: str
+
     LOGGING_LEVEL: str = "DEBUG"
     LOGGING_JSON: bool = True
     LOGGING_FORMAT: str = "%(asctime)s - %(filename)s - %(levelname)s - %(message)s"

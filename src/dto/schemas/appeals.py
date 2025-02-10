@@ -1,8 +1,10 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+from fastapi import UploadFile, File
 
 from utils.enums import AppealResponsibilityArea, AppealStatus
+from common.settings import settings
 
 
 class BaseAppeal(BaseModel):
@@ -11,7 +13,22 @@ class BaseAppeal(BaseModel):
 
 
 class AppealCreate(BaseAppeal):
-    ...
+    photo: list[UploadFile] | None = File(default=None, max_length=3)
+
+
+    @field_validator("photo")
+    @classmethod
+    def check_photo(cls, photo_list: list[UploadFile]):
+        if photo_list is None:
+            return
+
+        for photo in photo_list:
+            if photo.size > settings.MAX_PHOTO_SIZE_IN_BYTES:
+                raise ValueError("The maximum photo size has been exceeded")
+            if not photo.headers.get("content-type").startswith("image/"):
+                raise ValueError("Incorrect file uploaded")
+
+        return photo_list
 
 
 class BaseFilters(BaseModel):
