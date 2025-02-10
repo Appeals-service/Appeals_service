@@ -58,7 +58,7 @@ class AppealListResponse(BaseAppealResponse):
 
 
 class AppealResponse(BaseAppealResponse):
-    ...
+    photo: list[str] | None = None
 
 
 class UserAppealUpdate(BaseModel):

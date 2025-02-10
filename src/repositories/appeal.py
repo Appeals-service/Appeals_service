@@ -25,7 +25,13 @@ class AppealRepository:
     @staticmethod
     async def select_appeal(session: AsyncSession, appeal_id: int, user_id: str | None = None) -> Row:
         query = select(
-            Appeal.id, Appeal.message, Appeal.responsibility_area, Appeal.status, Appeal.comment, Appeal.created_at
+            Appeal.id,
+            Appeal.message,
+            Appeal.photo,
+            Appeal.responsibility_area,
+            Appeal.status,
+            Appeal.comment,
+            Appeal.created_at,
         ).where(Appeal.id == appeal_id)
 
         if user_id:
