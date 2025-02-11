@@ -41,9 +41,21 @@ class AppealRepository:
         return result.one_or_none()
 
     @staticmethod
+    async def select_appeals_photo(session: AsyncSession, filters: dict):
+        query = select(Appeal.photo).filter_by(**filters)
+        result = await session.execute(query)
+        return result.scalars().all()
+
+    @staticmethod
     async def update(session: AsyncSession, filters: dict, values: dict) -> Row:
         query = update(Appeal).values(**values).filter_by(**filters).returning(
-            Appeal.id, Appeal.message, Appeal.responsibility_area, Appeal.status, Appeal.comment, Appeal.created_at
+            Appeal.id,
+            Appeal.message,
+            Appeal.photo,
+            Appeal.responsibility_area,
+            Appeal.status,
+            Appeal.comment,
+            Appeal.created_at,
         )
         result = await session.execute(query)
         return result.one_or_none()

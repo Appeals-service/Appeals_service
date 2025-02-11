@@ -7,14 +7,8 @@ from utils.enums import AppealResponsibilityArea, AppealStatus
 from common.settings import settings
 
 
-class BaseAppeal(BaseModel):
-    message: str = Field(min_length=10, max_length=500, examples=["You really need to do something"])
-    responsibility_area: AppealResponsibilityArea = Field(examples=[AppealResponsibilityArea.housing])
-
-
-class AppealCreate(BaseAppeal):
+class PhotoMixin:
     photo: list[UploadFile] | None = File(default=None, max_length=3)
-
 
     @field_validator("photo")
     @classmethod
@@ -29,6 +23,15 @@ class AppealCreate(BaseAppeal):
                 raise ValueError("Incorrect file uploaded")
 
         return photo_list
+
+
+class BaseAppeal(BaseModel):
+    message: str = Field(min_length=10, max_length=500, examples=["You really need to do something"])
+    responsibility_area: AppealResponsibilityArea = Field(examples=[AppealResponsibilityArea.housing])
+
+
+class AppealCreate(BaseAppeal, PhotoMixin):
+    ...
 
 
 class BaseFilters(BaseModel):
@@ -61,7 +64,7 @@ class AppealResponse(BaseAppealResponse):
     photo: list[str] | None = None
 
 
-class UserAppealUpdate(BaseModel):
+class UserAppealUpdate(BaseModel, PhotoMixin):
     message: str | None = Field(
         default=None, min_length=10, max_length=500, examples=["You really need to do something"]
     )

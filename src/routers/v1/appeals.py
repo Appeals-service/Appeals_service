@@ -29,14 +29,23 @@ async def get_appeal(appeal_id: int, role_n_id: tuple[UserRole, str] = Depends(a
     return await AppealService.get_appeal(appeal_id, role_n_id)
 
 
-@router.patch("/{appeal_id}", response_model=AppealResponse | None, summary="Update appeal")
-async def update(
+@router.patch("/{appeal_id}/user", response_model=AppealResponse | None, summary="User's update appeal")
+async def users_update(
         appeal_id: int,
         user_upd_data: UserAppealUpdate = Depends(),
-        executor_upd_data: ExecutorAppealUpdate = Depends(),
-        role_n_id: tuple[UserRole, str] = Depends(allowed_for_all),
+        role_n_id: tuple[UserRole, str] = Depends(allowed_for_admin_user),
 ) -> Row | None:
-    return await AppealService.update(appeal_id, user_upd_data, executor_upd_data, role_n_id)
+    return await AppealService.users_update(appeal_id, user_upd_data, role_n_id)
+
+
+@router.patch("/{appeal_id}/executor", response_model=AppealResponse | None, summary="Executor's update appeal")
+async def executors_update(
+        appeal_id: int,
+        executor_upd_data: ExecutorAppealUpdate = Depends(),
+        role_n_id: tuple[UserRole, str] = Depends(allowed_for_admin_executor),
+) -> Row | None:
+    return await AppealService.executors_update(appeal_id, executor_upd_data, role_n_id)
+
 
 
 @router.delete("/{appeal_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete appeal")

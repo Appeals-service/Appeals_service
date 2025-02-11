@@ -21,9 +21,15 @@ class S3Client:
         async with self.session.create_client("s3", **self.config, verify=False) as client:
             yield client
 
-    async def upload_file(self, file: bytes, filename: str) -> None:
+    async def upload_files(self, photo_dict: dict[str, bytes]) -> None:
         async with self.get_client() as client:
-            await client.put_object(Bucket=self.bucket_name, Key=filename, Body=file)
+            for filename, photo in photo_dict.items():
+                await client.put_object(Bucket=self.bucket_name, Key=filename, Body=photo)
+
+    async def delete_files(self, filenames: list[str]) -> None:
+        async with self.get_client() as client:
+            for filename in filenames:
+                await client.delete_object(Bucket=self.bucket_name, Key=filename)
 
 
 s3_client = S3Client(

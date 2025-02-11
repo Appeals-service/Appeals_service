@@ -18,11 +18,8 @@ class AppealService:
     async def create(cls, appeal_data: AppealCreate, user_id: str) -> None:
         filenames_photo_dict = {}
         file_links = []
-        if appeal_data.photo:
-            for photo in appeal_data.photo:
-                filename = f"{user_id}_{photo.filename}"
-                filenames_photo_dict[filename] = photo.file.read()
-                file_links.append(f"{settings.SELECTEL_STORAGE_DOMAIN}/{filename}")
+        if photo := appeal_data.photo:
+            filenames_photo_dict, file_links = cls._get_photo_data(photo, user_id)
 
         appeal_data = appeal_data.model_dump(exclude={"photo"})
         appeal_data.update({"user_id": user_id, "status": AppealStatus.accepted, "photo": file_links})
@@ -34,7 +31,7 @@ class AppealService:
             except IntegrityError as e:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e.args[0].split('DETAIL:')[1]}")
 
-        asyncio.create_task(cls._upload_photo(filenames_photo_dict))
+        asyncio.create_task(s3_client.upload_files(filenames_photo_dict))
 
     @staticmethod
     async def get_appeals_list(filters: AppealListFilters, role_n_id: tuple[UserRole, str]) -> list[Row]:
@@ -59,26 +56,54 @@ class AppealService:
 
         return appeal_row
 
-    @staticmethod
-    async def update(
+    @classmethod
+    async def users_update(
+            cls,
             appeal_id: int,
             user_upd_data: UserAppealUpdate,
+            role_n_id: tuple[UserRole, str],
+    ) -> Row | None:
+        filters = {"id": appeal_id}
+        if role_n_id[0] == UserRole.user:
+            filters.update({"user_id": role_n_id[1], "status": AppealStatus.accepted})
+
+        values = user_upd_data.model_dump(exclude_none=True, exclude={"photo"})
+
+        filenames_photo_dict = {}
+        if photo := user_upd_data.photo:
+            filenames_photo_dict, file_links = cls._get_photo_data(photo, role_n_id[1])
+            values.update({"photo": file_links})
+
+        async with AsyncSession() as session:
+            if photo:
+                old_photo_links = await AppealRepository.select_appeals_photo(session, filters)
+            appeal_row = await AppealRepository.update(session, filters, values)
+            try:
+                await session.commit()
+            except IntegrityError as e:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e.args[0].split('DETAIL:')[1]}")
+
+        if not appeal_row:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal for update not found")
+
+        photo_to_delete = [link.split("/")[-1] for link in old_photo_links[0]]
+        asyncio.create_task(s3_client.delete_files(photo_to_delete))
+        asyncio.create_task(s3_client.upload_files(filenames_photo_dict))
+
+        return appeal_row
+
+    @classmethod
+    async def executors_update(
+            cls,
+            appeal_id: int,
             executor_upd_data: ExecutorAppealUpdate,
             role_n_id: tuple[UserRole, str],
     ) -> Row | None:
-        values = None
         filters = {"id": appeal_id}
-        if role_n_id[0] == UserRole.user:
-            values = user_upd_data.model_dump(exclude_none=True)
-            filters.update({"user_id": role_n_id[1], "status": AppealStatus.accepted})
-        elif role_n_id[0] == UserRole.executor:
-            values = executor_upd_data.model_dump(exclude_none=True)
+        if role_n_id[0] == UserRole.executor:
             filters.update({"executor_id": role_n_id[1], "status": AppealStatus.in_progress})
-        elif role_n_id[0] == UserRole.admin:
-            values = user_upd_data.model_dump(exclude_none=True)
-            values.update(executor_upd_data.model_dump(exclude_none=True))
 
-        if not values:
+        if not (values := executor_upd_data.model_dump(exclude_none=True)):
             return
 
         async with AsyncSession() as session:
@@ -128,8 +153,13 @@ class AppealService:
 
         return appeal_row
 
+    @classmethod
+    def _get_photo_data(cls, photo_list: list[UploadFile], user_id: str) -> tuple[dict[str, bytes], list[str]]:
+        filenames_photo_dict = {}
+        file_links = []
+        for photo in photo_list:
+            filename = f"{user_id}_{photo.filename}"
+            filenames_photo_dict[filename] = photo.file.read()
+            file_links.append(f"{settings.SELECTEL_STORAGE_DOMAIN}/{filename}")
 
-    @staticmethod
-    async def _upload_photo(photo_dict: dict[str, bytes]):
-        for filename, file in photo_dict.items():
-            await s3_client.upload_file(file=file, filename=filename)
+        return filenames_photo_dict, file_links
