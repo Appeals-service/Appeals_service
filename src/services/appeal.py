@@ -125,11 +125,14 @@ class AppealService:
             filters.update({"user_id": role_n_id[1], "status": AppealStatus.accepted})
 
         async with AsyncSession() as session:
-            await AppealRepository.delete(session, filters)
+            photo_links = await AppealRepository.delete(session, filters)
             try:
                 await session.commit()
             except IntegrityError as e:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e.args[0].split('DETAIL:')[1]}")
+
+        photo_to_delete = [link.split("/")[-1] for link in photo_links[0]]
+        asyncio.create_task(s3_client.delete_files(photo_to_delete))
 
     @staticmethod
     async def executor_assign(appeal_id: int, executor_id: str | None, role_n_id: tuple[UserRole, str]) -> Row:

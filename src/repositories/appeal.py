@@ -41,7 +41,7 @@ class AppealRepository:
         return result.one_or_none()
 
     @staticmethod
-    async def select_appeals_photo(session: AsyncSession, filters: dict):
+    async def select_appeals_photo(session: AsyncSession, filters: dict) -> list:
         query = select(Appeal.photo).filter_by(**filters)
         result = await session.execute(query)
         return result.scalars().all()
@@ -61,9 +61,10 @@ class AppealRepository:
         return result.one_or_none()
 
     @staticmethod
-    async def delete(session: AsyncSession, filters: dict) -> None:
-        query = delete(Appeal).filter_by(**filters)
-        await session.execute(query)
+    async def delete(session: AsyncSession, filters: dict) -> list:
+        query = delete(Appeal).filter_by(**filters).returning(Appeal.photo)
+        result = await session.execute(query)
+        return result.scalars().all()
 
     @staticmethod
     def _get_filtered_query(query: Select, filters: dict) -> Select:
