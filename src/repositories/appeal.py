@@ -50,6 +50,7 @@ class AppealRepository:
     async def update(session: AsyncSession, filters: dict, values: dict) -> Row:
         query = update(Appeal).values(**values).filter_by(**filters).returning(
             Appeal.id,
+            Appeal.user_id,
             Appeal.message,
             Appeal.photo,
             Appeal.responsibility_area,

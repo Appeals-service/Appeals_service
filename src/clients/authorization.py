@@ -30,6 +30,10 @@ class AuthorizationClient(BaseAsyncClient):
         async with self._get(path="/api/v1/users/list", params=params, cookies=cookies) as response:
             return response.status, await response.json()
 
+    async def get_user_email(self, user_id: str) -> tuple:
+        async with self._get(path=f"/api/v1/users/{user_id}/email") as response:
+            return response.status, await response.text()
+
     async def delete(self, cookies: dict, user_id: str) -> tuple:
         async with self._delete(path="/api/v1/users/delete", cookies=cookies, data=user_id) as response:
             return response.status, await response.json()

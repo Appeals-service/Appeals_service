@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.engine.row import Row
 
 from clients.S3 import s3_client
+from clients.authorization import authorization_client
 from common.settings import settings
 from db.connector import AsyncSession
 from dto.schemas.appeals import AppealCreate, AppealListFilters, ExecutorAppealUpdate, UserAppealUpdate
@@ -117,6 +118,16 @@ class AppealService:
         if not appeal_row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal for update not found")
 
+        user_email = await cls._get_user_email(appeal_row.user_id)
+        message = {
+            "email": user_email,
+            "appeal_id": appeal_row.id,
+            "status": executor_upd_data.status,
+            "comment": executor_upd_data.comment
+        }
+
+        # await cls._send_notification()
+
         return appeal_row
 
     @staticmethod
@@ -167,3 +178,15 @@ class AppealService:
             file_links.append(f"{settings.SELECTEL_STORAGE_DOMAIN}/{filename}")
 
         return filenames_photo_dict, file_links
+
+    @classmethod
+    async def _get_user_email(cls, user_id: str) -> str:
+        response_status, response = await authorization_client.get_user_email(user_id)
+
+        if response_status != status.HTTP_200_OK:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=response)
+
+        if not response:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="There is no email")
+
+        return response
