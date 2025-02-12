@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends, Request, Response, Body
+from fastapi import APIRouter, status, Request, Response, Body
 
 from dto.schemas.users import UserCreate, RefreshToken, UserAuth, UserBase, UserListResponse
 from services.user import UserService

@@ -18,7 +18,7 @@ class S3Client:
 
     @asynccontextmanager
     async def get_client(self) -> AioBaseClient:
-        async with self.session.create_client("s3", **self.config, verify=False) as client:
+        async with self.session.create_client("s3", **self.config) as client:
             yield client
 
     async def upload_files(self, photo_dict: dict[str, bytes]) -> None:

@@ -35,3 +35,8 @@ class UserAuth(BaseModel):
 
 class UserListResponse(UserBase):
     id: str
+
+
+class JWTUserData(BaseModel):
+    id: str
+    role: UserRole

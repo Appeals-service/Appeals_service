@@ -18,7 +18,7 @@ def get_user_agent(request: Request):
 
 def get_current_user_data(
         token: str = Depends(get_token), current_user_agent: str = Depends(get_user_agent)
-) -> tuple[UserRole, str]:
+) -> dict[str, str | UserRole]:
     check_token_type(token, TokenType.access)
 
     try:
@@ -41,7 +41,7 @@ def get_current_user_data(
     except AttributeError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token data")
 
-    return role, user_id
+    return {"id": user_id, "role": role}
 
 
 def check_token_type(token: str, required_type: TokenType) -> None:

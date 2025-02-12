@@ -8,6 +8,7 @@ from clients.S3 import s3_client
 from common.settings import settings
 from db.connector import AsyncSession
 from dto.schemas.appeals import AppealCreate, AppealListFilters, ExecutorAppealUpdate, UserAppealUpdate
+from dto.schemas.users import JWTUserData
 from repositories.appeal import AppealRepository
 from utils.enums import AppealStatus, UserRole
 
@@ -34,19 +35,19 @@ class AppealService:
         asyncio.create_task(s3_client.upload_files(filenames_photo_dict))
 
     @staticmethod
-    async def get_appeals_list(filters: AppealListFilters, role_n_id: tuple[UserRole, str]) -> list[Row]:
+    async def get_appeals_list(filters: AppealListFilters, user_data: JWTUserData) -> list[Row]:
         filters = filters.model_dump()
 
-        if filters.get("self") and role_n_id[0] in {UserRole.user, UserRole.executor}:
-            filters.update({f"{role_n_id[0]}_id": role_n_id[1]})
+        if filters.get("self") and user_data.role in {UserRole.user, UserRole.executor}:
+            filters.update({f"{user_data.role}_id": user_data.id})
 
         async with AsyncSession() as session:
             return await AppealRepository.select_appeals_list(session, filters)
 
 
     @staticmethod
-    async def get_appeal(appeal_id: int, role_n_id: tuple[UserRole, str]) -> Row:
-        user_id = role_n_id[1] if role_n_id[0] == UserRole.user else None
+    async def get_appeal(appeal_id: int, user_data: JWTUserData) -> Row:
+        user_id = user_data.id if user_data.role == UserRole.user else None
 
         async with AsyncSession() as session:
             appeal_row = await AppealRepository.select_appeal(session, appeal_id, user_id)
@@ -61,17 +62,17 @@ class AppealService:
             cls,
             appeal_id: int,
             user_upd_data: UserAppealUpdate,
-            role_n_id: tuple[UserRole, str],
+            user_data: JWTUserData,
     ) -> Row | None:
         filters = {"id": appeal_id}
-        if role_n_id[0] == UserRole.user:
-            filters.update({"user_id": role_n_id[1], "status": AppealStatus.accepted})
+        if user_data.role == UserRole.user:
+            filters.update({"user_id": user_data.id, "status": AppealStatus.accepted})
 
         values = user_upd_data.model_dump(exclude_none=True, exclude={"photo"})
 
         filenames_photo_dict = {}
         if photo := user_upd_data.photo:
-            filenames_photo_dict, file_links = cls._get_photo_data(photo, role_n_id[1])
+            filenames_photo_dict, file_links = cls._get_photo_data(photo, user_data.id)
             values.update({"photo": file_links})
 
         async with AsyncSession() as session:
@@ -97,11 +98,11 @@ class AppealService:
             cls,
             appeal_id: int,
             executor_upd_data: ExecutorAppealUpdate,
-            role_n_id: tuple[UserRole, str],
+            user_data: JWTUserData,
     ) -> Row | None:
         filters = {"id": appeal_id}
-        if role_n_id[0] == UserRole.executor:
-            filters.update({"executor_id": role_n_id[1], "status": AppealStatus.in_progress})
+        if user_data.role == UserRole.executor:
+            filters.update({"executor_id": user_data.id, "status": AppealStatus.in_progress})
 
         if not (values := executor_upd_data.model_dump(exclude_none=True)):
             return
@@ -119,10 +120,10 @@ class AppealService:
         return appeal_row
 
     @staticmethod
-    async def delete(appeal_id: int, role_n_id: tuple[UserRole, str]) -> None:
+    async def delete(appeal_id: int, user_data: JWTUserData) -> None:
         filters = {"id": appeal_id}
-        if role_n_id[0] == UserRole.user:
-            filters.update({"user_id": role_n_id[1], "status": AppealStatus.accepted})
+        if user_data.role == UserRole.user:
+            filters.update({"user_id": user_data.id, "status": AppealStatus.accepted})
 
         async with AsyncSession() as session:
             photo_links = await AppealRepository.delete(session, filters)
@@ -135,11 +136,11 @@ class AppealService:
         asyncio.create_task(s3_client.delete_files(photo_to_delete))
 
     @staticmethod
-    async def executor_assign(appeal_id: int, executor_id: str | None, role_n_id: tuple[UserRole, str]) -> Row:
-        if role_n_id[0] == UserRole.admin and not executor_id:
+    async def executor_assign(appeal_id: int, executor_id: str | None, user_data: JWTUserData) -> Row:
+        if user_data.role == UserRole.admin and not executor_id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The executor's ID is required")
-        elif role_n_id[0] == UserRole.executor:
-            executor_id = role_n_id[1]
+        elif user_data.role == UserRole.executor:
+            executor_id = user_data.id
 
         filters = {"id": appeal_id, "status": AppealStatus.accepted}
         values = {"executor_id": executor_id, "status": AppealStatus.in_progress}
