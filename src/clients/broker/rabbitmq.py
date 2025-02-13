@@ -22,19 +22,18 @@ class RabbitMQClient(AbstractBroker):
         try:
             self._connection = await connect_robust(settings.get_rmq_url())
             self._channel = await self._connection.channel()
-            self._exchange = await self._channel.declare_exchange(
-                name=settings.RABBITMQ_EXCHANGE_NAME, auto_delete=True
-            )
-            self._notification_queue = await self._channel.declare_queue(
-                name=settings.RABBITMQ_NOTIFICATION_QUEUE_NAME, auto_delete=True
-            )
+            self._exchange = await self._channel.declare_exchange(name=settings.RABBITMQ_EXCHANGE_NAME)
+            self._notification_queue = await self._channel.declare_queue(name=settings.RABBITMQ_NOTIFICATION_QUEUE_NAME)
             await self._notification_queue.bind(self._exchange, settings.RABBITMQ_NOTIFICATION_ROUTING_KEY)
 
-        except Exception:
+        except Exception as e:
             await self.disconnect()
+            raise ConnectionError(f"Connection to RabbitMQ failed\n{e}")
 
 
     async def disconnect(self) -> None:
+        await self._notification_queue.delete()
+        await self._exchange.delete()
         if self._channel and not self._channel.is_closed:
             await self._channel.close()
         if self._connection and not self._connection.is_closed:
