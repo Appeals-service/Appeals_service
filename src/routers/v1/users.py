@@ -68,9 +68,9 @@ async def get_users_list(request: Request, role: UserRole | None = None):
 
 
 @router.delete(
-    "/delete",
+    "/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete user",
 )
-async def delete(request: Request, user_id: str = Body()):
+async def delete(request: Request, user_id: str):
     return await UserService.delete(request.cookies, user_id)

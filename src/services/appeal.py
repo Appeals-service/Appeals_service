@@ -172,7 +172,7 @@ class AppealService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal for assign not found")
 
         await send_log(
-            LogLevel.info, f"Appeal is assigned to the executor. Appeal id = {appeal_id}. User id = {executor_id}"
+            LogLevel.info, f"Appeal is assigned to the executor. Appeal id = {appeal_id}. Executor id = {executor_id}"
         )
 
         return appeal_row
