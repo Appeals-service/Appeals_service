@@ -1,5 +1,6 @@
 from aio_pika import connect_robust, Message
 from aio_pika.abc import AbstractRobustConnection, AbstractRobustChannel, AbstractRobustExchange, AbstractRobustQueue
+from aio_pika.exceptions import ChannelPreconditionFailed
 import json
 
 from clients.broker.abstract_broker import AbstractBroker
@@ -38,14 +39,18 @@ class RabbitMQClient(AbstractBroker):
 
 
     async def disconnect(self) -> None:
-        await self._notification_queue.delete()
-        await self._logs_queue.delete()
         await self._exchange.delete()
+        try:
+            await self._notification_queue.delete()
+            await self._logs_queue.delete()
+        except ChannelPreconditionFailed:
+            pass
+
         if self._channel and not self._channel.is_closed:
             await self._channel.close()
         if self._connection and not self._connection.is_closed:
             await self._connection.close()
-        self._channel = self._connection = None
+        self._notification_queue = self._logs_queue = self._exchange = self._channel = self._connection = None
 
 
     async def send_notification(self, message: dict) -> None:
