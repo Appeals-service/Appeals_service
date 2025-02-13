@@ -2,7 +2,8 @@ from fastapi import Response, HTTPException, status, Request
 
 from clients.http.authorization import authorization_client
 from src.dto.schemas.users import UserCreate, UserAuth
-from utils.enums import UserRole
+from utils.enums import UserRole, LogLevel
+from utils.logging import send_log
 
 
 class UserService:
@@ -20,6 +21,9 @@ class UserService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Tokens have not been created")
 
         response.set_cookie(key="access_token", value=response_dict.get("access_token"), httponly=True)
+        await send_log(
+            LogLevel.info, f"The user is registered. User login = {user_data.login}. User role = {user_data.role}"
+        )
         return dict(refresh_token=response_dict.get("refresh_token"))
 
     @staticmethod
@@ -35,6 +39,9 @@ class UserService:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Tokens have not been created")
 
         response.set_cookie(key="access_token", value=response_dict.get("access_token"), httponly=True)
+
+        await send_log(LogLevel.info, f"The user is logged in. User = {user_data.login_or_email}")
+
         return dict(refresh_token=response_dict.get("refresh_token"))
 
     @staticmethod
@@ -82,6 +89,9 @@ class UserService:
                 ),
                 detail=response_dict,
             )
+
+        await send_log(LogLevel.info, f"The user is deleted. User id = {user_id}")
+
 
     @staticmethod
     async def get_list(cookies: dict, role: UserRole | None = None) -> list:

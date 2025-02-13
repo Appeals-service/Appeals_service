@@ -12,7 +12,8 @@ from db.connector import AsyncSession
 from dto.schemas.appeals import AppealCreate, AppealListFilters, ExecutorAppealUpdate, UserAppealUpdate
 from dto.schemas.users import JWTUserData
 from repositories.appeal import AppealRepository
-from utils.enums import AppealStatus, UserRole
+from utils.enums import AppealStatus, UserRole, LogLevel
+from utils.logging import send_log
 
 
 class AppealService:
@@ -28,13 +29,14 @@ class AppealService:
         appeal_data.update({"user_id": user_id, "status": AppealStatus.accepted, "photo": file_links})
 
         async with AsyncSession() as session:
-            await AppealRepository.insert(session, appeal_data)
+            appeal_id = await AppealRepository.insert(session, appeal_data)
             try:
                 await session.commit()
             except IntegrityError as e:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e.args[0].split('DETAIL:')[1]}")
 
         asyncio.create_task(s3_client.upload_files(filenames_photo_dict))
+        await send_log(LogLevel.info, f"Appeal created. Appeal id = {appeal_id}. User id = {user_id}")
 
     @staticmethod
     async def get_appeals_list(filters: AppealListFilters, user_data: JWTUserData) -> list[Row]:
@@ -93,6 +95,8 @@ class AppealService:
         asyncio.create_task(s3_client.delete_files(photo_to_delete))
         asyncio.create_task(s3_client.upload_files(filenames_photo_dict))
 
+        await send_log(LogLevel.info, f"Appeal updated by user. Appeal id = {appeal_id}. User id = {user_data.id}")
+
         return appeal_row
 
     @classmethod
@@ -119,7 +123,12 @@ class AppealService:
         if not appeal_row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal for update not found")
 
-        await cls._send_notification(appeal_row.user_id, appeal_row.id, executor_upd_data.status, executor_upd_data.comment)
+        await cls._send_notification(
+            appeal_row.user_id, appeal_row.id, executor_upd_data.status, executor_upd_data.comment
+        )
+        await send_log(
+            LogLevel.info, f"Appeal updated by executor. Appeal id = {appeal_id}. Executor id = {user_data.id}"
+        )
 
         return appeal_row
 
@@ -138,6 +147,9 @@ class AppealService:
 
         photo_to_delete = [link.split("/")[-1] for link in photo_links[0]]
         asyncio.create_task(s3_client.delete_files(photo_to_delete))
+
+        await send_log(LogLevel.info, f"Appeal deleted. Appeal id = {appeal_id}. User id = {user_data.id}")
+
 
     @staticmethod
     async def executor_assign(appeal_id: int, executor_id: str | None, user_data: JWTUserData) -> Row:
@@ -158,6 +170,10 @@ class AppealService:
 
         if not appeal_row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal for assign not found")
+
+        await send_log(
+            LogLevel.info, f"Appeal is assigned to the executor. Appeal id = {appeal_id}. User id = {executor_id}"
+        )
 
         return appeal_row
 
@@ -188,4 +204,4 @@ class AppealService:
     async def _send_notification(cls, user_id: str, appeal_id: str, appeal_status: AppealStatus, comment: str) -> None:
         user_email = await cls._get_user_email(user_id)
         message = {"email": user_email.strip('"'), "appeal_id": appeal_id, "status": appeal_status, "comment": comment}
-        await rmq_client.send_to_notification(message)
+        await rmq_client.send_notification(message)

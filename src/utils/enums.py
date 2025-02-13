@@ -23,3 +23,10 @@ class AppealResponsibilityArea(StrEnum):
 class TokenType(StrEnum):
     access = "acc"
     refresh = "ref"
+
+class LogLevel(StrEnum):
+    debug = "DEBUG"
+    info = "INFO"
+    warning = "WARNING"
+    error = "ERROR"
+    critical = "CRITICAL"

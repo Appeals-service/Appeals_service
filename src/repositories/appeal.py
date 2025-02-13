@@ -1,4 +1,4 @@
-from sqlalchemy import select, Select, update, delete
+from sqlalchemy import select, Select, update, delete, insert
 from sqlalchemy.engine.row import Row
 
 from datetime import timedelta
@@ -10,8 +10,10 @@ from db.tables import Appeal
 class AppealRepository:
 
     @staticmethod
-    async def insert(session: AsyncSession, appeal_data: dict) -> None:
-        session.add(Appeal(**appeal_data))
+    async def insert(session: AsyncSession, appeal_data: dict) -> int:
+        query = insert(Appeal).values(**appeal_data).returning(Appeal.id)
+        result = await session.execute(query)
+        return result.scalar()
 
     @classmethod
     async def select_appeals_list(cls, session: AsyncSession, filters: dict) -> list[Row]:
