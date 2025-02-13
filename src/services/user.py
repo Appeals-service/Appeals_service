@@ -1,6 +1,6 @@
 from fastapi import Response, HTTPException, status, Request
 
-from src.clients.authorization import authorization_client
+from clients.http.authorization import authorization_client
 from src.dto.schemas.users import UserCreate, UserAuth
 from utils.enums import UserRole
 

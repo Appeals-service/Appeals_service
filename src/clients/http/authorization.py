@@ -1,4 +1,4 @@
-from src.clients.base_http import BaseAsyncClient
+from clients.http.base import BaseAsyncClient
 from src.common.settings import settings
 from utils.enums import UserRole
 
@@ -35,7 +35,7 @@ class AuthorizationClient(BaseAsyncClient):
             return response.status, await response.text()
 
     async def delete(self, cookies: dict, user_id: str) -> tuple:
-        async with self._delete(path="/api/v1/users/delete", cookies=cookies, data=user_id) as response:
+        async with self._delete(path=f"/api/v1/users/{user_id}", cookies=cookies) as response:
             return response.status, await response.json()
 
 authorization_client = AuthorizationClient(settings.AUTHORIZATION_SERVICE_URL, settings.AUTHORIZATION_SERVICE_TIMEOUT)

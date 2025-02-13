@@ -2,7 +2,7 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ROOT_DIR = Path(__file__).parent.parent
+ROOT_DIR = Path(__file__).parent.parent.parent
 
 
 class Settings(BaseSettings):
@@ -32,6 +32,15 @@ class Settings(BaseSettings):
     S3_SECRET_KEY: str
     SELECTEL_STORAGE_DOMAIN: str
 
+    RABBITMQ_HOST: str = "localhost"
+    RABBITMQ_PORT: int = 5672
+    RABBITMQ_DEFAULT_USER: str
+    RABBITMQ_DEFAULT_PASS: str
+    RABBITMQ_EXCHANGE_NAME: str
+    RABBITMQ_NOTIFICATION_QUEUE_NAME: str
+    RABBITMQ_NOTIFICATION_ROUTING_KEY: str
+
+
     LOGGING_LEVEL: str = "DEBUG"
     LOGGING_JSON: bool = True
     LOGGING_FORMAT: str = "%(asctime)s - %(filename)s - %(levelname)s - %(message)s"
@@ -55,6 +64,11 @@ class Settings(BaseSettings):
     def get_db_url(self, async_mode: bool = True) -> str:
         return (f"{'postgresql+asyncpg' if async_mode else 'postgresql'}://"
                 f"{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}")
+
+
+    def get_rmq_url(self) -> str:
+        return (f"amqp://{self.RABBITMQ_DEFAULT_USER}:{self.RABBITMQ_DEFAULT_PASS}@"
+                f"{self.RABBITMQ_HOST}:{self.RABBITMQ_PORT}/")
 
 
 settings = Settings()
