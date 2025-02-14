@@ -1,5 +1,14 @@
-import pytest
+import asyncio
+
+import pytest_asyncio
 
 
 async def test_register():
-    pass
+    assert True
+
+async def test_register1():
+    assert True
+
+async def test_register2():
+    # await asyncio.sleep(20)
+    assert True

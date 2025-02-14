@@ -1,3 +1,5 @@
+import sys
+from uuid import uuid4
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -14,6 +16,8 @@ class Settings(BaseSettings):
     DB_PORT: int = 5432
     DB_NAME: str = "POSTGRES"
     DB_SCHEMA: str = "appeals_service"
+
+    TEST_DB_SCHEMA_PREFIX: str = "test_"
 
     DEBUG: bool = True
     RELOAD: bool = True
@@ -73,3 +77,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+if "pytest" in sys.modules:  # pragma: no cover
+    settings.DB_SCHEMA = settings.TEST_DB_SCHEMA_PREFIX + uuid4().hex + "_" + settings.DB_SCHEMA
