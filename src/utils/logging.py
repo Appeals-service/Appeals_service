@@ -2,7 +2,7 @@ from datetime import datetime
 
 from src.clients.broker.rabbitmq import rmq_client
 from src.common.settings import settings
-from utils.enums import LogLevel
+from src.utils.enums import LogLevel
 
 
 async def send_log(level: LogLevel, msg: str):

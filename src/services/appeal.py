@@ -4,16 +4,16 @@ from fastapi import HTTPException, status, UploadFile
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.engine.row import Row
 
-from clients.S3 import s3_client
+from src.clients.S3 import s3_client
 from src.clients.broker.rabbitmq import rmq_client
-from clients.http.authorization import authorization_client
-from common.settings import settings
-from db.connector import AsyncSession
-from dto.schemas.appeals import AppealCreate, AppealListFilters, ExecutorAppealUpdate, UserAppealUpdate
-from dto.schemas.users import JWTUserData
-from repositories.appeal import AppealRepository
-from utils.enums import AppealStatus, UserRole, LogLevel
-from utils.logging import send_log
+from src.clients.http.authorization import authorization_client
+from src.common.settings import settings
+from src.db.connector import AsyncSession
+from src.dto.schemas.appeals import AppealCreate, AppealListFilters, ExecutorAppealUpdate, UserAppealUpdate
+from src.dto.schemas.users import JWTUserData
+from src.repositories.appeal import AppealRepository
+from src.utils.enums import AppealStatus, UserRole, LogLevel
+from src.utils.logging import send_log
 
 
 class AppealService:

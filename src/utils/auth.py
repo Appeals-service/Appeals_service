@@ -2,8 +2,8 @@ import jwt
 from fastapi import Request, HTTPException, status, Depends
 from user_agents import parse
 
-from common.settings import settings
-from utils.enums import TokenType, UserRole
+from src.common.settings import settings
+from src.utils.enums import TokenType, UserRole
 
 
 def get_token(request: Request) -> str:

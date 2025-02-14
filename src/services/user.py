@@ -1,9 +1,9 @@
 from fastapi import Response, HTTPException, status, Request
 
-from clients.http.authorization import authorization_client
+from src.clients.http.authorization import authorization_client
 from src.dto.schemas.users import UserCreate, UserAuth
-from utils.enums import UserRole, LogLevel
-from utils.logging import send_log
+from src.utils.enums import UserRole, LogLevel
+from src.utils.logging import send_log
 
 
 class UserService:

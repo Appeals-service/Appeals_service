@@ -3,8 +3,8 @@ from sqlalchemy.engine.row import Row
 
 from datetime import timedelta
 
-from db.connector import AsyncSession
-from db.tables import Appeal
+from src.db.connector import AsyncSession
+from src.db.tables import Appeal
 
 
 class AppealRepository:

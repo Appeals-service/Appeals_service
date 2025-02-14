@@ -2,9 +2,9 @@
 
 from fastapi import Depends, HTTPException, status
 
-from dto.schemas.users import JWTUserData
-from utils.auth import get_current_user_data
-from utils.enums import UserRole
+from src.dto.schemas.users import JWTUserData
+from src.utils.auth import get_current_user_data
+from src.utils.enums import UserRole
 
 
 class RoleChecker:

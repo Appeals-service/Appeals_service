@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 
 from aiohttp import ClientConnectionError, ClientSession, ServerDisconnectedError
 
-from common.settings import settings
+from src.common.settings import settings
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format=settings.LOGGING_FORMAT)

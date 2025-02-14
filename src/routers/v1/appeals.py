@@ -1,12 +1,11 @@
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.engine.row import Row
 
-from dto.schemas.appeals import AppealCreate, AppealListFilters, AppealListResponse, AppealResponse, UserAppealUpdate, \
+from src.dto.schemas.appeals import AppealCreate, AppealListFilters, AppealListResponse, AppealResponse, UserAppealUpdate, \
     ExecutorAppealUpdate
-from dto.schemas.users import JWTUserData
-from services.appeal import AppealService
+from src.dto.schemas.users import JWTUserData
+from src.services.appeal import AppealService
 from src.utils.role_checker import allowed_for_admin_user, allowed_for_all, allowed_for_admin_executor
-from utils.enums import UserRole
 
 router = APIRouter(prefix="/appeals", tags=["Appeal"])
 
