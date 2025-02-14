@@ -46,10 +46,10 @@ def client() -> TestClient:
 
 
 @pytest.fixture
-def user_access_token() -> str:
+def user_data() -> dict:
     return create_access_token(UserRole.user)
 
 
 @pytest.fixture
-def executor_access_token() -> str:
+def executor_data() -> dict:
     return create_access_token(UserRole.executor)
