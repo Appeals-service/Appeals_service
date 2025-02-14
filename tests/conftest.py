@@ -8,6 +8,8 @@ from sqlalchemy import text
 from src.common.settings import ROOT_DIR, settings
 from src.db.connector import AsyncSession
 from src.main import app
+from src.utils.enums import UserRole
+from tests.utils.tokens import create_access_token
 
 
 @pytest.fixture(scope="session")
@@ -41,3 +43,13 @@ async def apply_migrations():
 @pytest.fixture
 def client() -> TestClient:
     return TestClient(app)
+
+
+@pytest.fixture
+def user_access_token() -> str:
+    return create_access_token(UserRole.user)
+
+
+@pytest.fixture
+def executor_access_token() -> str:
+    return create_access_token(UserRole.executor)

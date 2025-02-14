@@ -35,8 +35,9 @@ class AppealService:
             except IntegrityError as e:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e.args[0].split('DETAIL:')[1]}")
 
-        asyncio.create_task(s3_client.upload_files(filenames_photo_dict))
-        await send_log(LogLevel.info, f"Appeal created. Appeal id = {appeal_id}. User id = {user_id}")
+        if not settings.IS_TESTING:
+            asyncio.create_task(s3_client.upload_files(filenames_photo_dict))
+            await send_log(LogLevel.info, f"Appeal created. Appeal id = {appeal_id}. User id = {user_id}")
 
     @staticmethod
     async def get_appeals_list(filters: AppealListFilters, user_data: JWTUserData) -> list[Row]:

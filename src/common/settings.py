@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     DB_SCHEMA: str = "appeals_service"
 
     TEST_DB_SCHEMA_PREFIX: str = "test_"
+    IS_TESTING: bool = False
 
     DEBUG: bool = True
     RELOAD: bool = True
@@ -81,3 +82,5 @@ settings = Settings()
 
 if "pytest" in sys.modules:  # pragma: no cover
     settings.DB_SCHEMA = settings.TEST_DB_SCHEMA_PREFIX + uuid4().hex + "_" + settings.DB_SCHEMA
+    settings.SECRET_KEY = "test_secret_key_lksdf3"
+    settings.IS_TESTING = True
