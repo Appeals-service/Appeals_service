@@ -92,11 +92,13 @@ class AppealService:
         if not appeal_row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal for update not found")
 
-        photo_to_delete = [link.split("/")[-1] for link in old_photo_links[0]]
-        asyncio.create_task(s3_client.delete_files(photo_to_delete))
-        asyncio.create_task(s3_client.upload_files(filenames_photo_dict))
+        if not settings.IS_TESTING:
+            if photo:
+                photo_to_delete = [link.split("/")[-1] for link in old_photo_links[0]]
+                asyncio.create_task(s3_client.delete_files(photo_to_delete))
+                asyncio.create_task(s3_client.upload_files(filenames_photo_dict))
 
-        await send_log(LogLevel.info, f"Appeal updated by user. Appeal id = {appeal_id}. User id = {user_data.id}")
+            await send_log(LogLevel.info, f"Appeal updated by user. Appeal id = {appeal_id}. User id = {user_data.id}")
 
         return appeal_row
 
@@ -124,12 +126,13 @@ class AppealService:
         if not appeal_row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal for update not found")
 
-        await cls._send_notification(
-            appeal_row.user_id, appeal_row.id, executor_upd_data.status, executor_upd_data.comment
-        )
-        await send_log(
-            LogLevel.info, f"Appeal updated by executor. Appeal id = {appeal_id}. Executor id = {user_data.id}"
-        )
+        if not settings.IS_TESTING:
+            await cls._send_notification(
+                appeal_row.user_id, appeal_row.id, executor_upd_data.status, executor_upd_data.comment
+            )
+            await send_log(
+                LogLevel.info, f"Appeal updated by executor. Appeal id = {appeal_id}. Executor id = {user_data.id}"
+            )
 
         return appeal_row
 
@@ -146,10 +149,12 @@ class AppealService:
             except IntegrityError as e:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{e.args[0].split('DETAIL:')[1]}")
 
-        photo_to_delete = [link.split("/")[-1] for link in photo_links[0]]
-        asyncio.create_task(s3_client.delete_files(photo_to_delete))
+        if not settings.IS_TESTING:
+            if photo_links := photo_links[0]:
+                photo_to_delete = [link.split("/")[-1] for link in photo_links]
+                asyncio.create_task(s3_client.delete_files(photo_to_delete))
 
-        await send_log(LogLevel.info, f"Appeal deleted. Appeal id = {appeal_id}. User id = {user_data.id}")
+            await send_log(LogLevel.info, f"Appeal deleted. Appeal id = {appeal_id}. User id = {user_data.id}")
 
 
     @staticmethod
@@ -172,9 +177,11 @@ class AppealService:
         if not appeal_row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Appeal for assign not found")
 
-        await send_log(
-            LogLevel.info, f"Appeal is assigned to the executor. Appeal id = {appeal_id}. Executor id = {executor_id}"
-        )
+        if not settings.IS_TESTING:
+            await send_log(
+                LogLevel.info,
+                f"Appeal is assigned to the executor. Appeal id = {appeal_id}. Executor id = {executor_id}",
+            )
 
         return appeal_row
 

@@ -22,4 +22,4 @@ def create_access_token(role: str) -> dict:
     access_token = jwt.encode(
         payload=to_encode, key=settings.SECRET_KEY, algorithm=settings.ALGORITHM, headers={"typ": TokenType.access}
     )
-    return {"access_token": access_token, "user_id": user_id}
+    return {"access_token": access_token, "id": user_id}
