@@ -34,9 +34,8 @@ services:
     env_file:
       - ./.env_rmq
     restart: always
-    ports:
-      - 5672:5672
-      - 15672:15672
+    expose:
+      - 5672
     networks:
       - app_network
 
@@ -48,8 +47,8 @@ services:
     env_file:
       - ./.env_db
     restart: always
-    ports:
-      - 5432:5432
+    expose:
+      - 5432
     networks:
       - app_network
 
@@ -58,8 +57,8 @@ services:
     build: https://github.com/Appeals-service/Authorization_service.git
     env_file:
       - ./.env_auth
-    ports:
-      - 8001:8001
+    expose:
+      - 8001
     depends_on:
       - auth_service_db
     networks:
@@ -73,8 +72,8 @@ services:
     env_file:
       - ./.env_db_auth
     restart: always
-    ports:
-      - 5433:5433
+    expose:
+      - 5433
     networks:
       - app_network
 

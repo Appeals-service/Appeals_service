@@ -128,7 +128,7 @@ class AppealService:
 
         if not settings.IS_TESTING:
             await cls._send_notification(
-                appeal_row.user_id, appeal_row.id, executor_upd_data.status, executor_upd_data.comment
+                appeal_row.user_id, appeal_id, executor_upd_data.status, executor_upd_data.comment
             )
             await send_log(
                 LogLevel.info, f"Appeal updated by executor. Appeal id = {appeal_id}. Executor id = {user_data.id}"
@@ -209,7 +209,7 @@ class AppealService:
         return response
 
     @classmethod
-    async def _send_notification(cls, user_id: str, appeal_id: str, appeal_status: AppealStatus, comment: str) -> None:
+    async def _send_notification(cls, user_id: str, appeal_id: int, appeal_status: AppealStatus, comment: str) -> None:
         user_email = await cls._get_user_email(user_id)
         message = {"email": user_email.strip('"'), "appeal_id": appeal_id, "status": appeal_status, "comment": comment}
         await rmq_client.send_notification(message)
