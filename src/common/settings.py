@@ -26,8 +26,8 @@ class Settings(BaseSettings):
     SERVER_PORT: int = 8000
     CORS_ORIGINS: str = "*"
 
-    SECRET_KEY: str = "feisom_ob_teibl_rt54uyjhn67rtgfvbrtr_nyuumn"
-    ALGORITHM: str = "HS256"
+    SECRET_KEY: str
+    ALGORITHM: str
 
     MAX_PHOTO_SIZE_IN_BYTES: int = 5 * 1024 * 1024
 

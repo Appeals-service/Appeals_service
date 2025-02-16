@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+
+  appeals_service:
+    container_name: appeals_service
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    env_file:
+      - ../.env
+    ports:
+      - 8000:8000
+    depends_on:
+      - broker
+      - appeals_service_db
+    networks:
+      - app_network
+
+  broker:
+    container_name: broker
+    image: rabbitmq:4.0.5-management
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq_data/data
+    env_file:
+      - ./.env_rmq
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - app_network
+
+  appeals_service_db:
+    container_name: appeals_service_db
+    image: postgres:14.4-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./.env_db
+    restart: always
+    ports:
+      - 5432:5432
+    networks:
+      - app_network
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+
+networks:
+  app_network:

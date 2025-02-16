@@ -5,9 +5,9 @@ from sqlalchemy import select, insert
 from fastapi import status
 from random import choice
 
-from src.db.connector import AsyncSession
-from src.db.tables.appeals import Appeal
-from src.utils.enums import AppealStatus, AppealResponsibilityArea
+from db.connector import AsyncSession
+from db.tables.appeals import Appeal
+from utils.enums import AppealStatus, AppealResponsibilityArea
 
 
 @pytest.mark.parametrize(

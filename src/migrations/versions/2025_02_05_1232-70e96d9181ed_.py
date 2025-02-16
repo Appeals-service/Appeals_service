@@ -8,7 +8,7 @@ Create Date: 2025-02-05 12:32:15.076244
 from alembic import op
 import sqlalchemy as sa
 
-from src.common.settings import settings
+from common.settings import settings
 
 
 # revision identifiers, used by Alembic.

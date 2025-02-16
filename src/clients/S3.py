@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from aiobotocore.session import get_session
 from aiobotocore.client import AioBaseClient
 
-from src.common.settings import settings
+from common.settings import settings
 
 
 class S3Client:

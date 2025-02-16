@@ -5,10 +5,10 @@ from alembic import command
 from alembic.config import Config
 
 from sqlalchemy import text
-from src.common.settings import ROOT_DIR, settings
-from src.db.connector import AsyncSession
-from src.main import app
-from src.utils.enums import UserRole
+from common.settings import ROOT_DIR, settings
+from db.connector import AsyncSession
+from main import app
+from utils.enums import UserRole
 from tests.utils.tokens import create_access_token
 
 

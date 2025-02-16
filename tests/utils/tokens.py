@@ -3,8 +3,8 @@ import jwt
 from datetime import datetime, timezone, timedelta
 from uuid import uuid4
 
-from src.common.settings import settings
-from src.utils.enums import TokenType
+from common.settings import settings
+from utils.enums import TokenType
 
 
 def create_access_token(role: str) -> dict:

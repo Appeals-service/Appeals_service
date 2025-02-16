@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
-from src.db.connector import AsyncSession
+from db.connector import AsyncSession
 
 router = APIRouter(tags=["healthcheck"])
 

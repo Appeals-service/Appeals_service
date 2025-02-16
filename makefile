@@ -37,7 +37,7 @@ check-hints:
 	mypy .
 
 dc-up:
-	docker compose up -d --build
+	docker compose -f ./docker/docker-compose.yaml up -d --build
 
 dc-down:
-	docker compose down -v
+	docker compose -f ./docker/docker-compose.yaml down -v

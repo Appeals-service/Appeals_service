@@ -1,8 +1,8 @@
 from fastapi import APIRouter, status, Request, Response, Body
 
-from src.dto.schemas.users import UserCreate, RefreshToken, UserAuth, UserBase, UserListResponse
-from src.services.user import UserService
-from src.utils.enums import UserRole
+from dto.schemas.users import UserCreate, RefreshToken, UserAuth, UserBase, UserListResponse
+from services.user import UserService
+from utils.enums import UserRole
 
 router = APIRouter(prefix="/users", tags=["Users"])
 

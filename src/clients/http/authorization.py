@@ -1,6 +1,6 @@
-from src.clients.http.base import BaseAsyncClient
-from src.common.settings import settings
-from src.utils.enums import UserRole
+from clients.http.base import BaseAsyncClient
+from common.settings import settings
+from utils.enums import UserRole
 
 
 class AuthorizationClient(BaseAsyncClient):

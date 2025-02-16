@@ -3,8 +3,8 @@ from aio_pika.abc import AbstractRobustConnection, AbstractRobustChannel, Abstra
 from aio_pika.exceptions import ChannelPreconditionFailed
 import json
 
-from src.clients.broker.abstract_broker import AbstractBroker
-from src.common.settings import settings
+from clients.broker.abstract_broker import AbstractBroker
+from common.settings import settings
 
 
 class RabbitMQClient(AbstractBroker):
