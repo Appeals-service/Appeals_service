@@ -12,14 +12,23 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      - broker
-      - appeals_service_db
+      broker:
+        condition: service_healthy
+        restart: true
+      appeals_service_db:
+        condition: service_started
     networks:
       - app_network
 
   broker:
     container_name: broker
     image: rabbitmq:4.0.5-management
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 3s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq_data/data
     env_file:
@@ -44,7 +53,59 @@ services:
     networks:
       - app_network
 
+  auth_service:
+    container_name: auth_service
+    build: https://github.com/Appeals-service/Authorization_service.git
+    env_file:
+      - ./.env_auth
+    ports:
+      - 8001:8001
+    depends_on:
+      - auth_service_db
+    networks:
+      - app_network
+
+  auth_service_db:
+    container_name: auth_service_db
+    image: postgres:14.4-alpine
+    volumes:
+      - auth_postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./.env_db_auth
+    restart: always
+    ports:
+      - 5433:5433
+    networks:
+      - app_network
+
+  logging_service:
+    container_name: logging_service
+    build: https://github.com/Appeals-service/Logging_service.git
+    env_file:
+      - ./.env_logging
+    depends_on:
+      broker:
+        condition: service_healthy
+        restart: true
+    restart: on-failure
+    networks:
+      - app_network
+
+  notification_service:
+    container_name: notification_service
+    build: https://github.com/Appeals-service/Notification_service.git
+    env_file:
+      - ./.env_notification
+    depends_on:
+      broker:
+        condition: service_healthy
+        restart: true
+    restart: on-failure
+    networks:
+      - app_network
+
 volumes:
+  auth_postgres_data:
   postgres_data:
   rabbitmq_data:
 

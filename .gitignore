@@ -132,6 +132,12 @@ celerybeat.pid
 
 # Environments
 .env
+.env_auth
+.env_db
+.env_db_auth
+.env_logging
+.env_notification
+.env_rmq
 .venv
 env/
 venv/
