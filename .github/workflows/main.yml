@@ -13,12 +13,13 @@ jobs:
       - name: Update python
         run: sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt install python3.13
       - name: Install PostgreSQL
-        run: |
-          sudo apt-get install postgresql postgresql-client
-#          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
-#          sudo -u postgres psql -c "CREATE DATABASE POSTGRES;"
+        run: sudo apt-get install postgresql postgresql-client
       - name: Run PostgreSQL
         run: sudo service postgresql start
+      - name: Setup PostgreSQL
+        run: |
+          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+          sudo -u postgres psql -c "CREATE DATABASE POSTGRES;"
       - name: Install poetry
         run: pip install poetry==1.8.3
       - name: Install deps
