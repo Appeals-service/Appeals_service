@@ -11,7 +11,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Update python
-        run: sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt install python3.12
+        run: sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt install python3.13
       - name: Install poetry
         run: pip install poetry==1.8.3
       - name: Install deps
