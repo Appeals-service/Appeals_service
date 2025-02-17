@@ -15,8 +15,8 @@ jobs:
       - name: Install PostgreSQL
         run: |
           sudo apt-get install postgresql postgresql-client
-          sudo -u postgres psql -c "CREATE USER POSTGRES WITH PASSWORD 'POSTGRES';"
-          sudo -u postgres psql -c "CREATE DATABASE POSTGRES;"
+#          sudo -u postgres psql -c "CREATE USER POSTGRES WITH PASSWORD 'POSTGRES';"
+#          sudo -u postgres psql -c "CREATE DATABASE POSTGRES;"
       - name: Run PostgreSQL
         run: sudo service postgresql start
       - name: Install poetry
