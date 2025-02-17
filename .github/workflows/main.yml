@@ -14,7 +14,7 @@ jobs:
         run: sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt install python3.13
       - name: Install PostgreSQL
         run: |
-          sudo apt install postgresql-14.4
+          sudo apt-get install postgresql-14
           sudo -u postgres psql -c "CREATE USER POSTGRES WITH PASSWORD 'POSTGRES';"
           sudo -u postgres psql -c "CREATE DATABASE POSTGRES;"
       - name: Run PostgreSQL
