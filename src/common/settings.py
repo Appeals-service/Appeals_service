@@ -84,3 +84,9 @@ if "pytest" in sys.modules:  # pragma: no cover
     settings.DB_SCHEMA = settings.TEST_DB_SCHEMA_PREFIX + uuid4().hex + "_" + settings.DB_SCHEMA
     settings.SECRET_KEY = "test_secret_key_lksdf3"
     settings.IS_TESTING = True
+
+    settings.DB_USER = "POSTGRES"
+    settings.DB_PASSWORD = "POSTGRES"
+    settings.DB_HOST = "localhost"
+    settings.DB_PORT = 5432
+    settings.DB_NAME = "POSTGRES"
