@@ -14,6 +14,8 @@ jobs:
         run: sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt install python3.13
       - name: Install PostgreSQL
         run: sudo apt install postgresql
+      - name: Run PostgreSQL
+        run: postgres -D /usr/local/pgsql/data
       - name: Install poetry
         run: pip install poetry==1.8.3
       - name: Install deps
