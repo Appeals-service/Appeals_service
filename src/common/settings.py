@@ -86,7 +86,7 @@ if "pytest" in sys.modules:  # pragma: no cover
     settings.IS_TESTING = True
 
     settings.DB_USER = "postgres"
-    settings.DB_PASSWORD = ""
+    settings.DB_PASSWORD = "postgres"
     settings.DB_HOST = "localhost"
     settings.DB_PORT = 5432
     settings.DB_NAME = "postgres"
