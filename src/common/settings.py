@@ -83,6 +83,7 @@ settings = Settings()
 if "pytest" in sys.modules:  # pragma: no cover
     settings.DB_SCHEMA = settings.TEST_DB_SCHEMA_PREFIX + uuid4().hex + "_" + settings.DB_SCHEMA
     settings.SECRET_KEY = "test_secret_key_lksdf3"
+    settings.ALGORITHM = "HS256"
     settings.IS_TESTING = True
 
     settings.DB_USER = "postgres"
