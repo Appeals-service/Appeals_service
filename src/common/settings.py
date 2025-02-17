@@ -26,26 +26,26 @@ class Settings(BaseSettings):
     SERVER_PORT: int = 8000
     CORS_ORIGINS: str = "*"
 
-    SECRET_KEY: str
-    ALGORITHM: str
+    SECRET_KEY: str = ""
+    ALGORITHM: str = ""
 
     MAX_PHOTO_SIZE_IN_BYTES: int = 5 * 1024 * 1024
 
-    S3_URL: str
-    S3_BUCKET_NAME: str
-    S3_ACCESS_KEY: str
-    S3_SECRET_KEY: str
-    SELECTEL_STORAGE_DOMAIN: str
+    S3_URL: str = ""
+    S3_BUCKET_NAME: str = ""
+    S3_ACCESS_KEY: str = ""
+    S3_SECRET_KEY: str = ""
+    SELECTEL_STORAGE_DOMAIN: str = ""
 
     RABBITMQ_HOST: str = "localhost"
     RABBITMQ_PORT: int = 5672
-    RABBITMQ_DEFAULT_USER: str
-    RABBITMQ_DEFAULT_PASS: str
-    RABBITMQ_EXCHANGE_NAME: str
-    RABBITMQ_NOTIFICATION_QUEUE_NAME: str
-    RABBITMQ_NOTIFICATION_ROUTING_KEY: str
-    RABBITMQ_LOGS_QUEUE_NAME: str
-    RABBITMQ_LOGS_ROUTING_KEY: str
+    RABBITMQ_DEFAULT_USER: str = ""
+    RABBITMQ_DEFAULT_PASS: str = ""
+    RABBITMQ_EXCHANGE_NAME: str = ""
+    RABBITMQ_NOTIFICATION_QUEUE_NAME: str = ""
+    RABBITMQ_NOTIFICATION_ROUTING_KEY: str = ""
+    RABBITMQ_LOGS_QUEUE_NAME: str = ""
+    RABBITMQ_LOGS_ROUTING_KEY: str = ""
 
     LOGGING_LEVEL: str = "DEBUG"
     LOGGING_JSON: bool = True
