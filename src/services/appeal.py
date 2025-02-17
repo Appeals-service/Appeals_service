@@ -98,7 +98,9 @@ class AppealService:
                 asyncio.create_task(s3_client.delete_files(photo_to_delete))
                 asyncio.create_task(s3_client.upload_files(filenames_photo_dict))
 
-            await send_log(LogLevel.info, f"Appeal updated by user. Appeal id = {appeal_id}. User id = {user_data.id}")
+            await send_log(
+                LogLevel.info, f"Appeal updated by user. Appeal id = {appeal_id}. User id = {user_data.id}"
+            )
 
         return appeal_row
 
