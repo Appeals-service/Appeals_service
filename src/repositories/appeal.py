@@ -1,7 +1,7 @@
-from sqlalchemy import select, Select, update, delete, insert
-from sqlalchemy.engine.row import Row
-
 from datetime import timedelta
+
+from sqlalchemy import Select, delete, insert, select, update
+from sqlalchemy.engine.row import Row
 
 from db.connector import AsyncSession
 from db.tables import Appeal

@@ -1,15 +1,16 @@
-from fastapi.testclient import TestClient
-from asyncio import new_event_loop, get_running_loop
+from asyncio import get_running_loop, new_event_loop
+
 import pytest
 from alembic import command
 from alembic.config import Config
-
+from fastapi.testclient import TestClient
 from sqlalchemy import text
+
 from common.settings import ROOT_DIR, settings
 from db.connector import AsyncSession
 from main import app
-from utils.enums import UserRole
 from tests.utils.tokens import create_access_token
+from utils.enums import UserRole
 
 
 @pytest.fixture(scope="session")

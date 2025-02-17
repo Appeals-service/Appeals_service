@@ -1,7 +1,8 @@
-from aio_pika import connect_robust, Message
-from aio_pika.abc import AbstractRobustConnection, AbstractRobustChannel, AbstractRobustExchange, AbstractRobustQueue
-from aio_pika.exceptions import ChannelPreconditionFailed
 import json
+
+from aio_pika import Message, connect_robust
+from aio_pika.abc import AbstractRobustChannel, AbstractRobustConnection, AbstractRobustExchange, AbstractRobustQueue
+from aio_pika.exceptions import ChannelPreconditionFailed
 
 from clients.broker.abstract_broker import AbstractBroker
 from common.settings import settings

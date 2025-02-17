@@ -1,10 +1,10 @@
 from datetime import datetime
 
+from fastapi import File, UploadFile
 from pydantic import BaseModel, Field, field_validator
-from fastapi import UploadFile, File
 
-from utils.enums import AppealResponsibilityArea, AppealStatus
 from common.settings import settings
+from utils.enums import AppealResponsibilityArea, AppealStatus
 
 
 class PhotoMixin:

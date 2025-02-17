@@ -1,6 +1,6 @@
 import sys
-from uuid import uuid4
 from pathlib import Path
+from uuid import uuid4
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 

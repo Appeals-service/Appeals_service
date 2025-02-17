@@ -1,18 +1,18 @@
 import asyncio
 
-from fastapi import HTTPException, status, UploadFile
-from sqlalchemy.exc import IntegrityError
+from fastapi import HTTPException, UploadFile, status
 from sqlalchemy.engine.row import Row
+from sqlalchemy.exc import IntegrityError
 
-from clients.S3 import s3_client
 from clients.broker.rabbitmq import rmq_client
 from clients.http.authorization import authorization_client
+from clients.S3 import s3_client
 from common.settings import settings
 from db.connector import AsyncSession
 from dto.schemas.appeals import AppealCreate, AppealListFilters, ExecutorAppealUpdate, UserAppealUpdate
 from dto.schemas.users import JWTUserData
 from repositories.appeal import AppealRepository
-from utils.enums import AppealStatus, UserRole, LogLevel
+from utils.enums import AppealStatus, LogLevel, UserRole
 from utils.logging import send_log
 
 

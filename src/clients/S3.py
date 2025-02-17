@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
-from aiobotocore.session import get_session
 from aiobotocore.client import AioBaseClient
+from aiobotocore.session import get_session
 
 from common.settings import settings
 

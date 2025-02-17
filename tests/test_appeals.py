@@ -1,13 +1,13 @@
+from random import choice
 from uuid import uuid4
 
 import pytest
-from sqlalchemy import select, insert
 from fastapi import status
-from random import choice
+from sqlalchemy import insert, select
 
 from db.connector import AsyncSession
 from db.tables.appeals import Appeal
-from utils.enums import AppealStatus, AppealResponsibilityArea
+from utils.enums import AppealResponsibilityArea, AppealStatus
 
 
 @pytest.mark.parametrize(

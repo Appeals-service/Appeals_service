@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Text, ARRAY, String, Enum, UUID
+from sqlalchemy import ARRAY, UUID, Column, Enum, String, Text
 
-from db.tables.base import BaseModel, IdMixin, CreatedAtMixin, UpdatedAtMixin
-from utils.enums import AppealStatus, AppealResponsibilityArea
+from db.tables.base import BaseModel, CreatedAtMixin, IdMixin, UpdatedAtMixin
+from utils.enums import AppealResponsibilityArea, AppealStatus
 
 
 class Appeal(BaseModel, IdMixin, CreatedAtMixin, UpdatedAtMixin):

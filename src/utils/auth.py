@@ -1,5 +1,5 @@
 import jwt
-from fastapi import Request, HTTPException, status, Depends
+from fastapi import Depends, HTTPException, Request, status
 from user_agents import parse
 
 from common.settings import settings

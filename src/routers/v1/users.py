@@ -1,6 +1,6 @@
-from fastapi import APIRouter, status, Request, Response, Body
+from fastapi import APIRouter, Body, Request, Response, status
 
-from dto.schemas.users import UserCreate, RefreshToken, UserAuth, UserBase, UserListResponse
+from dto.schemas.users import RefreshToken, UserAuth, UserBase, UserCreate, UserListResponse
 from services.user import UserService
 from utils.enums import UserRole
 

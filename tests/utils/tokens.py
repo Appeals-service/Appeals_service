@@ -1,7 +1,7 @@
-import jwt
-
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
+
+import jwt
 
 from common.settings import settings
 from utils.enums import TokenType

@@ -1,11 +1,11 @@
-from fastapi import Response, HTTPException, status, Request
+from fastapi import HTTPException, Request, Response, status
 from pydantic import EmailStr
 
 from clients.broker.rabbitmq import rmq_client
 from clients.http.authorization import authorization_client
 from common.settings import settings
-from dto.schemas.users import UserCreate, UserAuth
-from utils.enums import UserRole, LogLevel
+from dto.schemas.users import UserAuth, UserCreate
+from utils.enums import LogLevel, UserRole
 from utils.logging import send_log
 
 
