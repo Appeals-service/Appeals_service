@@ -15,6 +15,9 @@ def cache(expire: int = settings.DEFAULT_CACHE_EXPIRATION):
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
+            if settings.IS_TESTING:
+                return await func(*args, **kwargs)
+
             key = create_cache_key(func.__name__, *args, **kwargs)
 
             if cached_data := await redis_client.get(key):
