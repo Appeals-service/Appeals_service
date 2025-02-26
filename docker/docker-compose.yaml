@@ -2,23 +2,23 @@ version: '3.8'
 
 services:
 
-  appeals_service:
-    container_name: appeals_service
-    build:
-      context: ../
-      dockerfile: docker/Dockerfile
-    env_file:
-      - ../.env
-    ports:
-      - 8000:8000
-    depends_on:
-      broker:
-        condition: service_healthy
-        restart: true
-      appeals_service_db:
-        condition: service_started
-    networks:
-      - app_network
+#  appeals_service:
+#    container_name: appeals_service
+#    build:
+#      context: ../
+#      dockerfile: docker/Dockerfile
+#    env_file:
+#      - ../.env.dev
+#    ports:
+#      - 8000:8000
+#    depends_on:
+#      broker:
+#        condition: service_healthy
+#        restart: true
+#      appeals_service_db:
+#        condition: service_started
+#    networks:
+#      - app_network
 
   broker:
     container_name: broker
@@ -34,8 +34,9 @@ services:
     env_file:
       - ./.env_rmq
     restart: always
-    expose:
-      - 5672
+    ports:
+      - 5672:5672
+      - 15672:15672
     networks:
       - app_network
 
@@ -47,8 +48,17 @@ services:
     env_file:
       - ./.env_db
     restart: always
-    expose:
-      - 5432
+    ports:
+      - 5432:5432
+    networks:
+      - app_network
+
+  cache_storage:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
     networks:
       - app_network
 
@@ -57,8 +67,8 @@ services:
     build: https://github.com/Appeals-service/Authorization_service.git
     env_file:
       - ./.env_auth
-    expose:
-      - 8001
+    ports:
+      - 8001:8001
     depends_on:
       - auth_service_db
     networks:
@@ -72,8 +82,8 @@ services:
     env_file:
       - ./.env_db_auth
     restart: always
-    expose:
-      - 5433
+    ports:
+      - 5433:5433
     networks:
       - app_network
 

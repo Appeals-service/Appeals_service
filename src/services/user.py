@@ -3,7 +3,6 @@ from pydantic import EmailStr
 
 from clients.broker.rabbitmq import rmq_client
 from clients.http.authorization import authorization_client
-from common.settings import settings
 from dto.schemas.users import UserAuth, UserCreate
 from utils.enums import LogLevel, UserRole
 from utils.logging import send_log
@@ -27,9 +26,7 @@ class UserService:
         await send_log(
             LogLevel.info, f"The user is registered. User login = {user_data.login}. User role = {user_data.role}"
         )
-
-        if not settings.IS_TESTING:
-            await cls._send_notification(user_data.email, f"Hi, {user_data.name}! Registration was successful.")
+        await cls._send_notification(user_data.email, f"Hi, {user_data.name}! Registration was successful.")
 
         return dict(refresh_token=response_dict.get("refresh_token"))
 

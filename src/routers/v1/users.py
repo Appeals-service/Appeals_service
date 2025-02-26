@@ -2,6 +2,7 @@ from fastapi import APIRouter, Body, Request, Response, status
 
 from dto.schemas.users import RefreshToken, UserAuth, UserBase, UserCreate, UserListResponse
 from services.user import UserService
+from utils.cache import cache
 from utils.enums import UserRole
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -53,6 +54,7 @@ async def refresh_tokens(request: Request, response: Response, refresh_token: st
     summary="Get current user data",
     response_description="User data",
 )
+@cache(expire=60)
 async def get_user_data(request: Request):
     return await UserService.get_me(request.cookies)
 

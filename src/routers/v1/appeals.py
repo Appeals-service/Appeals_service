@@ -11,6 +11,7 @@ from dto.schemas.appeals import (
 )
 from dto.schemas.users import JWTUserData
 from services.appeal import AppealService
+from utils.cache import cache
 from utils.role_checker import allowed_for_admin_executor, allowed_for_admin_user, allowed_for_all
 
 router = APIRouter(prefix="/appeals", tags=["Appeal"])
@@ -24,6 +25,7 @@ async def create(
 
 
 @router.get("/", response_model=list[AppealListResponse], summary="Get appeals list")
+@cache()
 async def get_appeals_list(
         filters: AppealListFilters = Depends(), user_data: JWTUserData = Depends(allowed_for_all)
 ) -> list[Row]:
@@ -31,6 +33,7 @@ async def get_appeals_list(
 
 
 @router.get("/{appeal_id}", response_model=AppealResponse, summary="Get appeal detail")
+@cache()
 async def get_appeal(appeal_id: int, user_data: JWTUserData = Depends(allowed_for_all)) -> Row:
     return await AppealService.get_appeal(appeal_id, user_data)
 

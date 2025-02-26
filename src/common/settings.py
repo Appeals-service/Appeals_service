@@ -31,6 +31,11 @@ class Settings(BaseSettings):
 
     MAX_PHOTO_SIZE_IN_BYTES: int = 5 * 1024 * 1024
 
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+
+    DEFAULT_CACHE_EXPIRATION: int = 10
+
     S3_URL: str = ""
     S3_BUCKET_NAME: str = ""
     S3_ACCESS_KEY: str = ""
@@ -56,7 +61,7 @@ class Settings(BaseSettings):
 
     ECHO: bool = False
 
-    model_config = SettingsConfigDict(env_file=ROOT_DIR / ".env", env_file_encoding="utf-8", extra="allow")
+    model_config = SettingsConfigDict(env_file=ROOT_DIR / ".env.dev", env_file_encoding="utf-8", extra="allow")
 
     @property
     def log_config(self) -> dict:

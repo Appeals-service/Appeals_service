@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 
 from clients.broker.rabbitmq import rmq_client
+from clients.cache.redis_client import redis_client
 from common import logger, settings
 from common.errors import ApplicationError
 from common.exception_handlers import error_handler, request_validation_error_handler
@@ -27,6 +28,7 @@ async def lifespan(app: FastAPI):
     await rmq_client.connect()
     yield
     await rmq_client.disconnect()
+    await redis_client.disconnect()
 
 
 def init_app() -> FastAPI:
