@@ -3,12 +3,15 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
+from sqladmin import Admin
 
+from admin_panel.admin_views import AppealAdmin
 from clients.broker.rabbitmq import rmq_client
 from clients.cache.redis_client import redis_client
 from common import logger, settings
 from common.errors import ApplicationError
 from common.exception_handlers import error_handler, request_validation_error_handler
+from db.connector import DatabaseConnector
 from middleware.cors import get_cors_middleware
 from routers.base import router
 
@@ -21,6 +24,11 @@ def setup_exception_handlers(app: FastAPI) -> None:
 
 def app_setup(app: FastAPI) -> None:
     setup_exception_handlers(app)
+
+
+def admin_panel_setup(app: FastAPI) -> None:
+    admin = Admin(app, DatabaseConnector.get_engine())
+    admin.add_view(AppealAdmin)
 
 
 @asynccontextmanager
@@ -43,4 +51,5 @@ def init_app() -> FastAPI:
     )
     app.include_router(router)
     app_setup(app)
+    admin_panel_setup(app)
     return app
